@@ -1,169 +1,515 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juego de Baile PRO RSTV</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Battle Groove — RSTV (Simon Says)</title>
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg,#000,#111);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-}
-h1 {
-  margin-top: 20px;
-  text-align: center;
-  background: linear-gradient(90deg,#d4af37,#b8860b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-#game {
-  position: relative;
-  width: 300px;
-  height: 500px;
-  background: rgba(0,0,0,0.85);
-  border: 2px solid #d4af37;
-  margin-top: 20px;
-  overflow: hidden;
-}
-.hit-zone {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  height: 50px;
-  border-top: 2px solid #d4af37;
-  display: flex;
-  justify-content: space-around;
-}
-.arrow {
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  line-height: 50px;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #d4af37;
-  border: 2px solid #b8860b;
-  border-radius: 8px;
-  position: absolute;
-  top: 0;
-  transition: top 0.02s linear, transform 0.2s ease;
-}
-.arrow.hit {
-  animation: hitFlash 0.3s forwards;
-}
-@keyframes hitFlash {
-  0% { transform: scale(1); color: #d4af37;}
-  50% { transform: scale(1.3); color: #fff;}
-  100% { transform: scale(1); color: #d4af37;}
-}
-#score {
-  margin-top: 20px;
-  font-size: 1.2rem;
-  color: #d4af37;
-}
+  :root{
+    --bg:#070707;
+    --panel:rgba(0,0,0,0.86);
+    --gold:#d4af37;
+    --gold-2:#b8860b;
+    --muted:#9a9a9a;
+    --accent:#ffd700;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    font-family:Poppins, system-ui, sans-serif;
+    background: linear-gradient(180deg,#050505,#0a0a0a 60%);
+    color:#fff; padding:18px;
+  }
+
+  .container{
+    width:100%; max-width:920px;
+    display:grid; grid-template-columns: 1fr 360px; gap:18px;
+  }
+
+  header{
+    grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:12px;
+  }
+  .brand{ font-weight:800; letter-spacing:1px;
+    background: linear-gradient(90deg,var(--gold),var(--gold-2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-transform:uppercase;
+  }
+  .sub{ color:var(--muted); font-size:0.95rem }
+
+  /* main panel */
+  .panel{
+    background:var(--panel); border-radius:12px; padding:16px; border:1px solid rgba(212,175,55,0.06);
+    box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  }
+
+  .game-area{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+    min-height:520px;
+  }
+
+  .groove-grid{
+    width:100%; max-width:520px; display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:14px;
+    padding:10px;
+  }
+
+  .pad{
+    aspect-ratio: 1.2 / 1;
+    min-height:130px;
+    border-radius:14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));
+    border: 3px solid rgba(212,175,55,0.12);
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:2.2rem;
+    color:var(--gold); cursor:pointer; user-select:none; transition: transform 0.12s ease, box-shadow 0.12s;
+    position:relative; overflow:visible;
+  }
+  .pad .label{ position:absolute; bottom:8px; font-size:0.85rem; color:var(--muted); font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+
+  .pad.active{
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(221, 173, 45, 0.18), inset 0 0 24px rgba(255,215,0,0.08);
+    background: radial-gradient(circle at 20% 20%, rgba(255,215,0,0.06), rgba(0,0,0,0.2));
+    color:#000;
+    border-color: rgba(255,215,0,0.9);
+  }
+
+  .controls{
+    display:flex; gap:12px; justify-content:center; margin-top:6px; flex-wrap:wrap;
+  }
+  .btn{
+    background:#000; color:var(--gold);
+    border:2px solid rgba(212,175,55,0.15);
+    padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer;
+  }
+  .btn:active{ transform: translateY(2px) }
+
+  .info{
+    margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  }
+  .stat{
+    background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; color:var(--gold); font-weight:700;
+  }
+
+  /* right column */
+  .sidebar{ display:flex; flex-direction:column; gap:12px; }
+
+  .leaderboard{ max-height:300px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+  .lb-row{ display:flex; justify-content:space-between; padding:8px 10px; border-radius:8px; background:linear-gradient(90deg, rgba(255,215,0,0.02), transparent); font-weight:700 }
+
+  .small{ color:var(--muted); font-size:0.95rem }
+
+  /* particles container */
+  .fx{ position:absolute; inset:0; pointer-events:none; z-index:80; }
+
+  /* modal save */
+  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:9999 }
+  .card{ background:linear-gradient(180deg,#0b0b0b,#070707); padding:18px; border-radius:12px; width:90%; max-width:420px; border:1px solid rgba(255,215,0,0.06) }
+
+  /* responsive */
+  @media (max-width:900px){
+    .container{ grid-template-columns: 1fr; }
+    .sidebar{ order:2 }
+    .panel{ order:1 }
+    .game-area{ min-height:460px }
+  }
 </style>
 </head>
 <body>
 
-<h1>RSTV Social Dance PRO</h1>
-<div id="game">
-  <div class="hit-zone">
-    <div>↑</div>
-    <div>↓</div>
-    <div>←</div>
-    <div>→</div>
+<div class="container">
+  <header>
+    <div>
+      <div class="brand">Battle Groove</div>
+      <div class="sub">Simon Says — RSTV Social Dance</div>
+    </div>
+    <div class="small">Presiona el patrón que ves, en el orden correcto. Toca para empezar.</div>
+  </header>
+
+  <section class="panel">
+    <div class="game-area" id="gameArea">
+      <div style="position:relative; width:100%; display:flex; justify-content:center;">
+        <div class="fx" id="fx"></div>
+      </div>
+
+      <div class="groove-grid" id="grid">
+        <div class="pad" data-key="ArrowUp" id="padUp">↑<div class="label">Arriba</div></div>
+        <div class="pad" data-key="ArrowRight" id="padRight">→<div class="label">Derecha</div></div>
+        <div class="pad" data-key="ArrowLeft" id="padLeft">←<div class="label">Izquierda</div></div>
+        <div class="pad" data-key="ArrowDown" id="padDown">↓<div class="label">Abajo</div></div>
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn">Comenzar</button>
+        <button id="strictBtn" class="btn">Modo Estricto: OFF</button>
+        <button id="soundBtn" class="btn">🔊 Sonido</button>
+      </div>
+
+      <div class="info">
+        <div class="stat" id="roundStat">Ronda: 0</div>
+        <div class="stat" id="lenStat">Longitud: 0</div>
+        <div class="stat" id="bestStat">Récord: 0</div>
+      </div>
+
+      <div class="small" style="text-align:center; margin-top:8px;">Usa teclado o toca las casillas. En modo estricto, un fallo termina la partida.</div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <div class="panel">
+      <h3 style="margin:0;color:var(--gold)">Ranking local</h3>
+      <div class="leaderboard" id="leaderboard">
+        <div class="small">No hay puntajes aun — sé el primero</div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button id="showSave" class="btn">Guardar puntaje</button>
+        <button id="resetLB" class="btn">Limpiar ranking</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin:0;color:var(--gold)">Instrucciones</h3>
+      <p class="small" style="margin-top:8px">Observa la secuencia (las casillas brillan en dorado), repítela en el mismo orden. Cada ronda añade un paso. Si fallas, pierdes (o vuelves a empezar la ronda en modo normal).</p>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin:0;color:var(--gold)">Opciones</h3>
+      <div style="margin-top:8px" class="small">Velocidad de reproducción y efectos ajustables (se auto-optimiza según tu dispositivo).</div>
+    </div>
+  </aside>
+</div>
+
+<!-- save modal -->
+<div id="modalSave" class="modal" role="dialog" aria-modal="true">
+  <div class="card">
+    <h3>Guardar puntaje</h3>
+    <p class="small">Tu puntaje: <strong id="finalPoints">0</strong></p>
+    <input id="playerName" placeholder="Tu nombre" style="width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:#050505; color:#fff">
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button id="saveScoreBtn" class="btn">Guardar</button>
+      <button id="closeSave" class="btn">Cancelar</button>
+    </div>
   </div>
 </div>
-<div id="score">Puntaje: 0 | Combo: 0</div>
 
-<!-- Música opcional -->
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
-
+<!-- audio via WebAudio fallback -->
 <script>
-const game = document.getElementById("game");
-const scoreDisplay = document.getElementById("score");
-const music = document.getElementById("music");
+/* ======== Battle Groove (Simon Says) - PRO ======== */
 
-const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
-const symbols = ["↑","↓","←","→"];
-let arrows = [];
+/* CONFIG & STATE */
+const pads = {
+  ArrowUp: document.getElementById('padUp'),
+  ArrowRight: document.getElementById('padRight'),
+  ArrowLeft: document.getElementById('padLeft'),
+  ArrowDown: document.getElementById('padDown')
+};
+const fxLayer = document.getElementById('fx');
+const startBtn = document.getElementById('startBtn');
+const strictBtn = document.getElementById('strictBtn');
+const soundBtn = document.getElementById('soundBtn');
+const roundStat = document.getElementById('roundStat');
+const lenStat = document.getElementById('lenStat');
+const bestStat = document.getElementById('bestStat');
+const leaderboardEl = document.getElementById('leaderboard');
+const showSave = document.getElementById('showSave');
+const resetLB = document.getElementById('resetLB');
+const modalSave = document.getElementById('modalSave');
+const finalPointsEl = document.getElementById('finalPoints');
+const saveScoreBtn = document.getElementById('saveScoreBtn');
+const closeSave = document.getElementById('closeSave');
+const playerNameInput = document.getElementById('playerName');
+
+const LB_KEY = 'rstv_battlegroove_lb_v1';
+let seq = [];         // sequence to follow
+let playerSeq = [];   // what player pressed this round
+let round = 0;
+let playingBack = false;
+let strictMode = false;
+let enabledSound = true;
+let bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+
+bestStat.textContent = `Récord: ${bestScore}`;
+
+/* Audio: use WebAudio to generate tones quickly */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new AudioCtx();
+}
+function playTone(freq, duration=180, gain=0.12){
+  if(!enabledSound) return;
+  ensureAudio();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.value = freq;
+  g.gain.value = gain;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + duration/1000);
+}
+
+/* map pad -> frequency (musical) */
+const soundMap = {
+  ArrowUp: 880,
+  ArrowRight: 659.25,
+  ArrowLeft: 523.25,
+  ArrowDown: 440
+};
+
+/* helpers: random choice */
+function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* leaderboard functions */
+function loadLB(){ try{ return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }catch(e){ return [] } }
+function saveLB(lb){ localStorage.setItem(LB_KEY, JSON.stringify(lb.slice(0,10))); }
+function addToLB(name, pts){
+  const lb = loadLB();
+  lb.push({name, pts, at: Date.now()});
+  lb.sort((a,b)=>b.pts - a.pts);
+  saveLB(lb);
+  renderLB();
+}
+function renderLB(){
+  const lb = loadLB();
+  leaderboardEl.innerHTML = '';
+  if(lb.length === 0){ leaderboardEl.innerHTML = '<div class="small">Sin puntajes — sé el primero</div>'; return; }
+  lb.slice(0,10).forEach((r, idx)=>{
+    const row = document.createElement('div'); row.className='lb-row';
+    row.innerHTML = `<div>${idx+1}. ${r.name}</div><div>${r.pts}</div>`;
+    leaderboardEl.appendChild(row);
+  });
+}
+renderLB();
+
+/* visual particle when pad lights up */
+function spawnParticleAt(el){
+  const rect = el.getBoundingClientRect();
+  const parentRect = fxLayer.parentElement.getBoundingClientRect();
+  const x = rect.left + rect.width/2 - parentRect.left;
+  const y = rect.top + rect.height/2 - parentRect.top;
+  for(let i=0;i<10;i++){
+    const p = document.createElement('div');
+    p.style.position='absolute';
+    p.style.left = x + (Math.random()*40-20) + 'px';
+    p.style.top = y + (Math.random()*40-20) + 'px';
+    p.style.width = '10px'; p.style.height='10px'; p.style.borderRadius='50%';
+    p.style.background = `radial-gradient(circle, ${getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#ffd700'}, ${getComputedStyle(document.documentElement).getPropertyValue('--gold-2') || '#b8860b'})`;
+    p.style.opacity = 1; p.style.zIndex = 99;
+    p.style.transform = `translate(0,0) scale(1)`;
+    fxLayer.appendChild(p);
+    // animate
+    const tx = (Math.random()*120 - 60), ty = (Math.random()*-140 - 20);
+    p.animate([{transform:'translate(0,0) scale(1)', opacity:1},{transform:`translate(${tx}px,${ty}px) scale(0.2)`, opacity:0}], {duration:700 + Math.random()*300, easing:'cubic-bezier(.2,.9,.2,1)'});
+    setTimeout(()=>p.remove(), 1100);
+  }
+}
+
+/* flash pad visually & play tone */
+function flashPad(key){
+  const el = pads[key];
+  if(!el) return;
+  el.classList.add('active');
+  spawnParticleAt(el);
+  if(enabledSound) playTone(soundMap[key], 220, 0.12);
+  setTimeout(()=>el.classList.remove('active'), 220);
+}
+
+/* play sequence back to player with timing that speeds up gradually */
+function playbackSequence(seqArr){
+  playingBack = true;
+  let idx = 0;
+  const baseDelay = Math.max(400 - Math.floor(seqArr.length * 6), 180); // speeds up as sequence grows
+  function step(){
+    if(idx >= seqArr.length){
+      playingBack = false;
+      return;
+    }
+    const k = seqArr[idx];
+    flashPad(k);
+    idx++;
+    setTimeout(step, baseDelay);
+  }
+  setTimeout(step, 600);
+}
+
+/* add a random step and play */
+function addStepAndPlay(){
+  const keysList = Object.keys(pads);
+  const next = choice(keysList);
+  seq.push(next);
+  round = seq.length;
+  updateStats();
+  playbackSequence(seq);
+}
+
+/* update UI stats */
+function updateStats(){
+  roundStat.textContent = `Ronda: ${round}`;
+  lenStat.textContent = `Longitud: ${seq.length}`;
+  bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+  bestStat.textContent = `Récord: ${bestScore}`;
+}
+
+/* on player input */
+function playerPress(key){
+  if(playingBack) return; // ignore inputs during playback
+  if(!seq.length) return;
+  // register
+  playerSeq.push(key);
+  // visual & sound
+  flashPad(key);
+  // validate immediate correct step
+  const i = playerSeq.length - 1;
+  if(playerSeq[i] !== seq[i]){
+    // fail
+    onFail();
+    return;
+  }
+  // if completed sequence
+  if(playerSeq.length === seq.length){
+    // success: short celebration, then next round
+    // award points: length^2 maybe
+    const gained = 10 + seq.length * 4;
+    score += gained;
+    // update best
+    if(score > bestScore) {
+      bestScore = score;
+      localStorage.setItem('battlegroove_best', bestScore);
+    }
+    updateStats();
+    // small explosion
+    bigSuccess();
+    // reset playerSeq and add new step after a small pause
+    playerSeq = [];
+    setTimeout(()=> addStepAndPlay(), 700);
+  }
+}
+
+/* fail behavior */
 let score = 0;
-let combo = 0;
-let speed = 3;
-let intervalCreate = 1000;
-
-const hitStart = 420;
-const hitEnd = 470;
-
-// Crear flecha
-function createArrow(){
-  const index = Math.floor(Math.random()*4);
-  const key = keys[index];
-  const symbol = symbols[index];
-  const arrow = document.createElement("div");
-  arrow.classList.add("arrow");
-  arrow.textContent = symbol;
-  arrow.dataset.key = key;
-  arrow.style.left = 60*index + "px";
-  arrow.style.top = "-60px";
-  game.appendChild(arrow);
-  arrows.push(arrow);
+function onFail(){
+  // visual shake & red flash, sound buzz
+  const gameArea = document.getElementById('gameArea');
+  gameArea.animate([{transform:'translateX(0)'},{transform:'translateX(-12px)'},{transform:'translateX(12px)'},{transform:'translateX(0)'}], {duration:420});
+  // low buzz sound
+  if(enabledSound){
+    ensureAudio();
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.frequency.value = 120; o.type='sawtooth'; g.gain.value = 0.1;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.18);
+  }
+  // if strict, end game; else replay same round (player gets another try)
+  if(strictMode){
+    endRound();
+  } else {
+    playerSeq = [];
+    // replay sequence for retry
+    setTimeout(()=> playbackSequence(seq), 700);
+  }
 }
 
-// Mover flechas
-function moveArrows(){
-  arrows.forEach((arrow,i)=>{
-    let top = parseInt(arrow.style.top);
-    arrow.style.top = top + speed + "px";
-
-    if(top > game.clientHeight){
-      game.removeChild(arrow);
-      arrows.splice(i,1);
-      combo = 0;
-      score -= 5;
-      updateScore();
-    }
-  });
+/* success big effect */
+function bigSuccess(){
+  // golden burst center
+  const center = document.createElement('div');
+  center.style.position='absolute'; center.style.left='50%'; center.style.top='30%';
+  center.style.transform='translate(-50%,-50%)'; center.style.width='220px'; center.style.height='220px';
+  center.style.borderRadius='50%'; center.style.background='radial-gradient(circle, rgba(255,215,0,0.85), rgba(255,215,0,0.2) 30%, transparent 55%)';
+  center.style.zIndex = 200; center.style.pointerEvents='none';
+  fxLayer.appendChild(center);
+  center.animate([{opacity:1, transform:'translate(-50%,-50%) scale(0.6)'},{opacity:0, transform:'translate(-50%,-50%) scale(1.2)'}], {duration:700, easing:'cubic-bezier(.2,.9,.2,1)'});
+  setTimeout(()=> center.remove(), 750);
 }
 
-// Detectar aciertos
-document.addEventListener("keydown",(e)=>{
-  arrows.forEach((arrow,i)=>{
-    let top = parseInt(arrow.style.top);
-    if(e.key === arrow.dataset.key && top >= hitStart && top <= hitEnd){
-      // Animación hit
-      arrow.classList.add("hit");
-      setTimeout(()=>arrow.remove(),300);
-      arrows.splice(i,1);
-      score += 10 + combo*2;
-      combo += 1;
-      updateScore();
-      speed += 0.05; // aumenta velocidad progresiva
-      if(intervalCreate>400) intervalCreate -=5; // aumenta frecuencia
-    }
-  });
+/* game lifecycle */
+function startGame(){
+  seq = []; playerSeq = []; round = 0; score = 0;
+  updateStats();
+  addStepAndPlay();
+  // reset score UI stored on local
+  updateScoreStat();
+}
+function endRound(){
+  // show save modal for score
+  finalPointsEl.textContent = score;
+  modalSave.style.display = 'flex';
+}
+
+/* score UI */
+function updateScoreStat(){
+  document.getElementById('scoreBox')?.remove?.(); // no-op safe
+  // We reflect score in lenStat or additional stat; for now bestStat and roundStat updated
+}
+
+/* big success helper: spawn many particles */
+function spawnManyParticlesForPad(key){
+  const el = pads[key];
+  if(!el) return;
+  spawnParticleAt(el);
+  // extra flash
+  el.classList.add('active');
+  setTimeout(()=>el.classList.remove('active'), 250);
+}
+
+/* event bindings */
+Object.keys(pads).forEach(k=>{
+  pads[k].addEventListener('mousedown', ()=>{ if(!playingBack) playerPress(k); });
+  pads[k].addEventListener('touchstart', (e)=>{ e.preventDefault(); if(!playingBack) playerPress(k); }, {passive:false});
 });
 
-function updateScore(){
-  scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo}`;
-}
+/* keyboard */
+document.addEventListener('keydown', (e)=>{
+  if(Object.keys(pads).includes(e.key)){
+    if(!playingBack) playerPress(e.key);
+  }
+});
 
-// Loop de movimiento
-setInterval(moveArrows,20);
+/* controls */
+startBtn.addEventListener('click', ()=>{
+  // ensure audio context created on user gesture for mobile
+  ensureAudio();
+  startGame();
+});
+strictBtn.addEventListener('click', ()=>{
+  strictMode = !strictMode;
+  strictBtn.textContent = `Modo Estricto: ${strictMode ? 'ON' : 'OFF'}`;
+});
+soundBtn.addEventListener('click', ()=>{
+  enabledSound = !enabledSound;
+  soundBtn.textContent = enabledSound ? '🔊 Sonido' : '🔇 Silencio';
+});
 
-// Loop de creación de flechas con velocidad progresiva
-function arrowLoop(){
-  createArrow();
-  setTimeout(arrowLoop, intervalCreate);
-}
-arrowLoop();
+/* modal save */
+closeSave.addEventListener('click', ()=> modalSave.style.display='none');
+saveScoreBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Jugador';
+  addToLB(name, score);
+  modalSave.style.display='none';
+  // update best
+  bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+  bestStat.textContent = `Récord: ${bestScore}`;
+});
+
+/* show save button handling */
+showSave.addEventListener('click', ()=>{
+  finalPointsEl.textContent = score;
+  modalSave.style.display='flex';
+});
+
+/* reset leaderboard */
+resetLB.addEventListener('click', ()=>{
+  if(confirm('¿Limpiar ranking local?')) { localStorage.removeItem(LB_KEY); renderLB(); }
+});
+
+/* initialize UI */
+updateStats();
+renderLB();
+
+/* expose small debug hook */
+window._battlegroove = { startGame, seq };
+
 </script>
-
 </body>
 </html>
