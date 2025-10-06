@@ -1,515 +1,198 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Battle Groove — RSTV (Simon Says)</title>
-<style>
-  :root{
-    --bg:#070707;
-    --panel:rgba(0,0,0,0.86);
-    --gold:#d4af37;
-    --gold-2:#b8860b;
-    --muted:#9a9a9a;
-    --accent:#ffd700;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; min-height:100vh;
-    display:flex; align-items:center; justify-content:center;
-    font-family:Poppins, system-ui, sans-serif;
-    background: linear-gradient(180deg,#050505,#0a0a0a 60%);
-    color:#fff; padding:18px;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSTV Social Dance</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #111;
+      color: #fff;
+      overflow-x: hidden;
+      display: flex;
+    }
 
-  .container{
-    width:100%; max-width:920px;
-    display:grid; grid-template-columns: 1fr 360px; gap:18px;
-  }
+    /* ======= MENÚ LATERAL ======= */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background: #1e1e1e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+      border-right: 3px solid #ff4081;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
 
-  header{
-    grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:12px;
-  }
-  .brand{ font-weight:800; letter-spacing:1px;
-    background: linear-gradient(90deg,var(--gold),var(--gold-2));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-transform:uppercase;
-  }
-  .sub{ color:var(--muted); font-size:0.95rem }
+    .sidebar h2 {
+      color: #ff4081;
+      margin-bottom: 30px;
+    }
 
-  /* main panel */
-  .panel{
-    background:var(--panel); border-radius:12px; padding:16px; border:1px solid rgba(212,175,55,0.06);
-    box-shadow:0 8px 30px rgba(0,0,0,0.6);
-  }
+    .sidebar a {
+      text-decoration: none;
+      color: #fff;
+      background: #333;
+      padding: 12px 20px;
+      margin: 8px 0;
+      border-radius: 10px;
+      width: 80%;
+      text-align: center;
+      transition: 0.3s;
+      font-weight: 600;
+    }
 
-  .game-area{
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
-    min-height:520px;
-  }
+    .sidebar a:hover {
+      background: #ff4081;
+      color: #fff;
+      transform: scale(1.05);
+    }
 
-  .groove-grid{
-    width:100%; max-width:520px; display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:14px;
-    padding:10px;
-  }
+    /* ======= CONTENIDO ======= */
+    main {
+      margin-left: 220px;
+      width: calc(100% - 220px);
+      transition: margin-left 0.3s ease;
+    }
 
-  .pad{
-    aspect-ratio: 1.2 / 1;
-    min-height:130px;
-    border-radius:14px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));
-    border: 3px solid rgba(212,175,55,0.12);
-    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:2.2rem;
-    color:var(--gold); cursor:pointer; user-select:none; transition: transform 0.12s ease, box-shadow 0.12s;
-    position:relative; overflow:visible;
-  }
-  .pad .label{ position:absolute; bottom:8px; font-size:0.85rem; color:var(--muted); font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+    section {
+      min-height: 100vh;
+      padding: 80px 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
-  .pad.active{
-    transform: scale(1.08);
-    box-shadow: 0 12px 30px rgba(221, 173, 45, 0.18), inset 0 0 24px rgba(255,215,0,0.08);
-    background: radial-gradient(circle at 20% 20%, rgba(255,215,0,0.06), rgba(0,0,0,0.2));
-    color:#000;
-    border-color: rgba(255,215,0,0.9);
-  }
+    section:nth-child(odd) { background: #222; }
+    section:nth-child(even) { background: #111; }
 
-  .controls{
-    display:flex; gap:12px; justify-content:center; margin-top:6px; flex-wrap:wrap;
-  }
-  .btn{
-    background:#000; color:var(--gold);
-    border:2px solid rgba(212,175,55,0.15);
-    padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer;
-  }
-  .btn:active{ transform: translateY(2px) }
+    h1 {
+      font-size: 2.5em;
+      color: #ff4081;
+      margin-bottom: 15px;
+    }
 
-  .info{
-    margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
-  }
-  .stat{
-    background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; color:var(--gold); font-weight:700;
-  }
+    p {
+      max-width: 600px;
+      color: #ddd;
+      line-height: 1.6;
+      font-size: 1.1em;
+    }
 
-  /* right column */
-  .sidebar{ display:flex; flex-direction:column; gap:12px; }
+    /* ======= BOTÓN HAMBURGUESA ======= */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #ff4081;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      font-size: 22px;
+      border-radius: 8px;
+      z-index: 1100;
+      cursor: pointer;
+    }
 
-  .leaderboard{ max-height:300px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
-  .lb-row{ display:flex; justify-content:space-between; padding:8px 10px; border-radius:8px; background:linear-gradient(90deg, rgba(255,215,0,0.02), transparent); font-weight:700 }
+    /* ======= RESPONSIVE ======= */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
 
-  .small{ color:var(--muted); font-size:0.95rem }
+      .sidebar.active {
+        transform: translateX(0);
+      }
 
-  /* particles container */
-  .fx{ position:absolute; inset:0; pointer-events:none; z-index:80; }
+      .menu-toggle {
+        display: block;
+      }
 
-  /* modal save */
-  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:9999 }
-  .card{ background:linear-gradient(180deg,#0b0b0b,#070707); padding:18px; border-radius:12px; width:90%; max-width:420px; border:1px solid rgba(255,215,0,0.06) }
-
-  /* responsive */
-  @media (max-width:900px){
-    .container{ grid-template-columns: 1fr; }
-    .sidebar{ order:2 }
-    .panel{ order:1 }
-    .game-area{ min-height:460px }
-  }
-</style>
+      main {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <div>
-      <div class="brand">Battle Groove</div>
-      <div class="sub">Simon Says — RSTV Social Dance</div>
-    </div>
-    <div class="small">Presiona el patrón que ves, en el orden correcto. Toca para empezar.</div>
-  </header>
+  <!-- Botón para abrir/cerrar menú en móvil -->
+  <button class="menu-toggle">☰</button>
 
-  <section class="panel">
-    <div class="game-area" id="gameArea">
-      <div style="position:relative; width:100%; display:flex; justify-content:center;">
-        <div class="fx" id="fx"></div>
-      </div>
-
-      <div class="groove-grid" id="grid">
-        <div class="pad" data-key="ArrowUp" id="padUp">↑<div class="label">Arriba</div></div>
-        <div class="pad" data-key="ArrowRight" id="padRight">→<div class="label">Derecha</div></div>
-        <div class="pad" data-key="ArrowLeft" id="padLeft">←<div class="label">Izquierda</div></div>
-        <div class="pad" data-key="ArrowDown" id="padDown">↓<div class="label">Abajo</div></div>
-      </div>
-
-      <div class="controls">
-        <button id="startBtn" class="btn">Comenzar</button>
-        <button id="strictBtn" class="btn">Modo Estricto: OFF</button>
-        <button id="soundBtn" class="btn">🔊 Sonido</button>
-      </div>
-
-      <div class="info">
-        <div class="stat" id="roundStat">Ronda: 0</div>
-        <div class="stat" id="lenStat">Longitud: 0</div>
-        <div class="stat" id="bestStat">Récord: 0</div>
-      </div>
-
-      <div class="small" style="text-align:center; margin-top:8px;">Usa teclado o toca las casillas. En modo estricto, un fallo termina la partida.</div>
-    </div>
-  </section>
-
-  <aside class="sidebar">
-    <div class="panel">
-      <h3 style="margin:0;color:var(--gold)">Ranking local</h3>
-      <div class="leaderboard" id="leaderboard">
-        <div class="small">No hay puntajes aun — sé el primero</div>
-      </div>
-      <div style="display:flex; gap:8px; margin-top:8px;">
-        <button id="showSave" class="btn">Guardar puntaje</button>
-        <button id="resetLB" class="btn">Limpiar ranking</button>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3 style="margin:0;color:var(--gold)">Instrucciones</h3>
-      <p class="small" style="margin-top:8px">Observa la secuencia (las casillas brillan en dorado), repítela en el mismo orden. Cada ronda añade un paso. Si fallas, pierdes (o vuelves a empezar la ronda en modo normal).</p>
-    </div>
-
-    <div class="panel">
-      <h3 style="margin:0;color:var(--gold)">Opciones</h3>
-      <div style="margin-top:8px" class="small">Velocidad de reproducción y efectos ajustables (se auto-optimiza según tu dispositivo).</div>
-    </div>
-  </aside>
-</div>
-
-<!-- save modal -->
-<div id="modalSave" class="modal" role="dialog" aria-modal="true">
-  <div class="card">
-    <h3>Guardar puntaje</h3>
-    <p class="small">Tu puntaje: <strong id="finalPoints">0</strong></p>
-    <input id="playerName" placeholder="Tu nombre" style="width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:#050505; color:#fff">
-    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-      <button id="saveScoreBtn" class="btn">Guardar</button>
-      <button id="closeSave" class="btn">Cancelar</button>
-    </div>
+  <!-- Menú lateral -->
+  <div class="sidebar">
+    <h2>RSTV</h2>
+    <a href="#inicio">Inicio</a>
+    <a href="#coreografias">Coreografías</a>
+    <a href="#bailes">Bailes</a>
+    <a href="#juego">Juego</a>
+    <a href="#nosotros">Nosotros</a>
   </div>
-</div>
 
-<!-- audio via WebAudio fallback -->
-<script>
-/* ======== Battle Groove (Simon Says) - PRO ======== */
+  <!-- Contenido principal -->
+  <main>
+    <section id="inicio">
+      <h1>Bienvenido a RSTV Social Dance</h1>
+      <p>Donde el ritmo, el arte y la comunidad se unen 💃🕺</p>
+    </section>
 
-/* CONFIG & STATE */
-const pads = {
-  ArrowUp: document.getElementById('padUp'),
-  ArrowRight: document.getElementById('padRight'),
-  ArrowLeft: document.getElementById('padLeft'),
-  ArrowDown: document.getElementById('padDown')
-};
-const fxLayer = document.getElementById('fx');
-const startBtn = document.getElementById('startBtn');
-const strictBtn = document.getElementById('strictBtn');
-const soundBtn = document.getElementById('soundBtn');
-const roundStat = document.getElementById('roundStat');
-const lenStat = document.getElementById('lenStat');
-const bestStat = document.getElementById('bestStat');
-const leaderboardEl = document.getElementById('leaderboard');
-const showSave = document.getElementById('showSave');
-const resetLB = document.getElementById('resetLB');
-const modalSave = document.getElementById('modalSave');
-const finalPointsEl = document.getElementById('finalPoints');
-const saveScoreBtn = document.getElementById('saveScoreBtn');
-const closeSave = document.getElementById('closeSave');
-const playerNameInput = document.getElementById('playerName');
+    <section id="coreografias">
+      <h1>Coreografías</h1>
+      <p>Aquí puedes pegar el menú desplegable de coreografías.</p>
+      <!-- 🔽 Pega tu menú desplegable aquí -->
+      <div id="menu-coreografias"></div>
+    </section>
 
-const LB_KEY = 'rstv_battlegroove_lb_v1';
-let seq = [];         // sequence to follow
-let playerSeq = [];   // what player pressed this round
-let round = 0;
-let playingBack = false;
-let strictMode = false;
-let enabledSound = true;
-let bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+    <section id="bailes">
+      <h1>Bailes</h1>
+      <p>Explora nuestros estilos más populares, desde salsa y bachata hasta cumbia urbana.</p>
+    </section>
 
-bestStat.textContent = `Récord: ${bestScore}`;
+    <section id="juego">
+      <h1>Juego</h1>
+      <p>Pega aquí tu juego de baile interactivo.</p>
+      <!-- 🔽 Pega tu juego aquí -->
+      <div id="contenedor-juego" style="margin-top:20px; width:100%; height:500px; background:#000; border:2px dashed #ff4081;">
+        <!-- Juego irá aquí -->
+      </div>
+    </section>
 
-/* Audio: use WebAudio to generate tones quickly */
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx = null;
-function ensureAudio(){
-  if(!audioCtx) audioCtx = new AudioCtx();
-}
-function playTone(freq, duration=180, gain=0.12){
-  if(!enabledSound) return;
-  ensureAudio();
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.type = 'sine';
-  o.frequency.value = freq;
-  g.gain.value = gain;
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start();
-  o.stop(audioCtx.currentTime + duration/1000);
-}
+    <section id="nosotros">
+      <h1>Nosotros</h1>
+      <p>Somos RSTV Social Dance: pasión, energía y comunidad en cada paso.</p>
+    </section>
+  </main>
 
-/* map pad -> frequency (musical) */
-const soundMap = {
-  ArrowUp: 880,
-  ArrowRight: 659.25,
-  ArrowLeft: 523.25,
-  ArrowDown: 440
-};
+  <script>
+    // Desplazamiento suave
+    document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+        if (window.innerWidth <= 768) {
+          document.querySelector('.sidebar').classList.remove('active');
+        }
+      });
+    });
 
-/* helpers: random choice */
-function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+    // Activar menú móvil
+    document.querySelector('.menu-toggle').addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.toggle('active');
+    });
+  </script>
 
-/* leaderboard functions */
-function loadLB(){ try{ return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }catch(e){ return [] } }
-function saveLB(lb){ localStorage.setItem(LB_KEY, JSON.stringify(lb.slice(0,10))); }
-function addToLB(name, pts){
-  const lb = loadLB();
-  lb.push({name, pts, at: Date.now()});
-  lb.sort((a,b)=>b.pts - a.pts);
-  saveLB(lb);
-  renderLB();
-}
-function renderLB(){
-  const lb = loadLB();
-  leaderboardEl.innerHTML = '';
-  if(lb.length === 0){ leaderboardEl.innerHTML = '<div class="small">Sin puntajes — sé el primero</div>'; return; }
-  lb.slice(0,10).forEach((r, idx)=>{
-    const row = document.createElement('div'); row.className='lb-row';
-    row.innerHTML = `<div>${idx+1}. ${r.name}</div><div>${r.pts}</div>`;
-    leaderboardEl.appendChild(row);
-  });
-}
-renderLB();
-
-/* visual particle when pad lights up */
-function spawnParticleAt(el){
-  const rect = el.getBoundingClientRect();
-  const parentRect = fxLayer.parentElement.getBoundingClientRect();
-  const x = rect.left + rect.width/2 - parentRect.left;
-  const y = rect.top + rect.height/2 - parentRect.top;
-  for(let i=0;i<10;i++){
-    const p = document.createElement('div');
-    p.style.position='absolute';
-    p.style.left = x + (Math.random()*40-20) + 'px';
-    p.style.top = y + (Math.random()*40-20) + 'px';
-    p.style.width = '10px'; p.style.height='10px'; p.style.borderRadius='50%';
-    p.style.background = `radial-gradient(circle, ${getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#ffd700'}, ${getComputedStyle(document.documentElement).getPropertyValue('--gold-2') || '#b8860b'})`;
-    p.style.opacity = 1; p.style.zIndex = 99;
-    p.style.transform = `translate(0,0) scale(1)`;
-    fxLayer.appendChild(p);
-    // animate
-    const tx = (Math.random()*120 - 60), ty = (Math.random()*-140 - 20);
-    p.animate([{transform:'translate(0,0) scale(1)', opacity:1},{transform:`translate(${tx}px,${ty}px) scale(0.2)`, opacity:0}], {duration:700 + Math.random()*300, easing:'cubic-bezier(.2,.9,.2,1)'});
-    setTimeout(()=>p.remove(), 1100);
-  }
-}
-
-/* flash pad visually & play tone */
-function flashPad(key){
-  const el = pads[key];
-  if(!el) return;
-  el.classList.add('active');
-  spawnParticleAt(el);
-  if(enabledSound) playTone(soundMap[key], 220, 0.12);
-  setTimeout(()=>el.classList.remove('active'), 220);
-}
-
-/* play sequence back to player with timing that speeds up gradually */
-function playbackSequence(seqArr){
-  playingBack = true;
-  let idx = 0;
-  const baseDelay = Math.max(400 - Math.floor(seqArr.length * 6), 180); // speeds up as sequence grows
-  function step(){
-    if(idx >= seqArr.length){
-      playingBack = false;
-      return;
-    }
-    const k = seqArr[idx];
-    flashPad(k);
-    idx++;
-    setTimeout(step, baseDelay);
-  }
-  setTimeout(step, 600);
-}
-
-/* add a random step and play */
-function addStepAndPlay(){
-  const keysList = Object.keys(pads);
-  const next = choice(keysList);
-  seq.push(next);
-  round = seq.length;
-  updateStats();
-  playbackSequence(seq);
-}
-
-/* update UI stats */
-function updateStats(){
-  roundStat.textContent = `Ronda: ${round}`;
-  lenStat.textContent = `Longitud: ${seq.length}`;
-  bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
-  bestStat.textContent = `Récord: ${bestScore}`;
-}
-
-/* on player input */
-function playerPress(key){
-  if(playingBack) return; // ignore inputs during playback
-  if(!seq.length) return;
-  // register
-  playerSeq.push(key);
-  // visual & sound
-  flashPad(key);
-  // validate immediate correct step
-  const i = playerSeq.length - 1;
-  if(playerSeq[i] !== seq[i]){
-    // fail
-    onFail();
-    return;
-  }
-  // if completed sequence
-  if(playerSeq.length === seq.length){
-    // success: short celebration, then next round
-    // award points: length^2 maybe
-    const gained = 10 + seq.length * 4;
-    score += gained;
-    // update best
-    if(score > bestScore) {
-      bestScore = score;
-      localStorage.setItem('battlegroove_best', bestScore);
-    }
-    updateStats();
-    // small explosion
-    bigSuccess();
-    // reset playerSeq and add new step after a small pause
-    playerSeq = [];
-    setTimeout(()=> addStepAndPlay(), 700);
-  }
-}
-
-/* fail behavior */
-let score = 0;
-function onFail(){
-  // visual shake & red flash, sound buzz
-  const gameArea = document.getElementById('gameArea');
-  gameArea.animate([{transform:'translateX(0)'},{transform:'translateX(-12px)'},{transform:'translateX(12px)'},{transform:'translateX(0)'}], {duration:420});
-  // low buzz sound
-  if(enabledSound){
-    ensureAudio();
-    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-    o.frequency.value = 120; o.type='sawtooth'; g.gain.value = 0.1;
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start(); o.stop(audioCtx.currentTime + 0.18);
-  }
-  // if strict, end game; else replay same round (player gets another try)
-  if(strictMode){
-    endRound();
-  } else {
-    playerSeq = [];
-    // replay sequence for retry
-    setTimeout(()=> playbackSequence(seq), 700);
-  }
-}
-
-/* success big effect */
-function bigSuccess(){
-  // golden burst center
-  const center = document.createElement('div');
-  center.style.position='absolute'; center.style.left='50%'; center.style.top='30%';
-  center.style.transform='translate(-50%,-50%)'; center.style.width='220px'; center.style.height='220px';
-  center.style.borderRadius='50%'; center.style.background='radial-gradient(circle, rgba(255,215,0,0.85), rgba(255,215,0,0.2) 30%, transparent 55%)';
-  center.style.zIndex = 200; center.style.pointerEvents='none';
-  fxLayer.appendChild(center);
-  center.animate([{opacity:1, transform:'translate(-50%,-50%) scale(0.6)'},{opacity:0, transform:'translate(-50%,-50%) scale(1.2)'}], {duration:700, easing:'cubic-bezier(.2,.9,.2,1)'});
-  setTimeout(()=> center.remove(), 750);
-}
-
-/* game lifecycle */
-function startGame(){
-  seq = []; playerSeq = []; round = 0; score = 0;
-  updateStats();
-  addStepAndPlay();
-  // reset score UI stored on local
-  updateScoreStat();
-}
-function endRound(){
-  // show save modal for score
-  finalPointsEl.textContent = score;
-  modalSave.style.display = 'flex';
-}
-
-/* score UI */
-function updateScoreStat(){
-  document.getElementById('scoreBox')?.remove?.(); // no-op safe
-  // We reflect score in lenStat or additional stat; for now bestStat and roundStat updated
-}
-
-/* big success helper: spawn many particles */
-function spawnManyParticlesForPad(key){
-  const el = pads[key];
-  if(!el) return;
-  spawnParticleAt(el);
-  // extra flash
-  el.classList.add('active');
-  setTimeout(()=>el.classList.remove('active'), 250);
-}
-
-/* event bindings */
-Object.keys(pads).forEach(k=>{
-  pads[k].addEventListener('mousedown', ()=>{ if(!playingBack) playerPress(k); });
-  pads[k].addEventListener('touchstart', (e)=>{ e.preventDefault(); if(!playingBack) playerPress(k); }, {passive:false});
-});
-
-/* keyboard */
-document.addEventListener('keydown', (e)=>{
-  if(Object.keys(pads).includes(e.key)){
-    if(!playingBack) playerPress(e.key);
-  }
-});
-
-/* controls */
-startBtn.addEventListener('click', ()=>{
-  // ensure audio context created on user gesture for mobile
-  ensureAudio();
-  startGame();
-});
-strictBtn.addEventListener('click', ()=>{
-  strictMode = !strictMode;
-  strictBtn.textContent = `Modo Estricto: ${strictMode ? 'ON' : 'OFF'}`;
-});
-soundBtn.addEventListener('click', ()=>{
-  enabledSound = !enabledSound;
-  soundBtn.textContent = enabledSound ? '🔊 Sonido' : '🔇 Silencio';
-});
-
-/* modal save */
-closeSave.addEventListener('click', ()=> modalSave.style.display='none');
-saveScoreBtn.addEventListener('click', ()=>{
-  const name = playerNameInput.value.trim() || 'Jugador';
-  addToLB(name, score);
-  modalSave.style.display='none';
-  // update best
-  bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
-  bestStat.textContent = `Récord: ${bestScore}`;
-});
-
-/* show save button handling */
-showSave.addEventListener('click', ()=>{
-  finalPointsEl.textContent = score;
-  modalSave.style.display='flex';
-});
-
-/* reset leaderboard */
-resetLB.addEventListener('click', ()=>{
-  if(confirm('¿Limpiar ranking local?')) { localStorage.removeItem(LB_KEY); renderLB(); }
-});
-
-/* initialize UI */
-updateStats();
-renderLB();
-
-/* expose small debug hook */
-window._battlegroove = { startGame, seq };
-
-</script>
 </body>
 </html>
