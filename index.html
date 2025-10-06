@@ -1,626 +1,519 @@
+
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Tropiflow Drop — RSTV Social Dance</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Battle Groove — RSTV (Simon Says)</title>
 <style>
   :root{
-    --bg:#070707; --panel:rgba(0,0,0,0.85);
-    --gold:#d4af37; --gold-2:#b8860b; --muted:#8b8b8b;
+    --bg:#070707;
+    --panel:rgba(0,0,0,0.86);
+    --gold:#d4af37;
+    --gold-2:#b8860b;
+    --muted:#9a9a9a;
+    --accent:#ffd700;
   }
   *{box-sizing:border-box}
   body{
     margin:0; min-height:100vh;
     display:flex; align-items:center; justify-content:center;
     font-family:Poppins, system-ui, sans-serif;
-    background: linear-gradient(180deg,#050505 0%, #0a0a0a 60%);
-    color:#fff;
-    padding:18px;
+    background: linear-gradient(180deg,#050505,#0a0a0a 60%);
+    color:#fff; padding:18px;
   }
 
-  .wrap{
-    width:100%;
-    max-width:1100px;
-    display:grid;
-    grid-template-columns: 1fr 320px;
-    gap:18px;
-    align-items:start;
+  .container{
+    width:100%; max-width:920px;
+    display:grid; grid-template-columns: 1fr 360px; gap:18px;
   }
 
   header{
-    grid-column: 1 / -1;
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:6px;
+    grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:12px;
   }
-  .brand{
-    font-weight:800; font-size:1.15rem; letter-spacing:1px;
+  .brand{ font-weight:800; letter-spacing:1px;
     background: linear-gradient(90deg,var(--gold),var(--gold-2));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    text-transform:uppercase;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-transform:uppercase;
   }
-  .subtitle{ color:var(--muted); font-size:0.9rem }
+  .sub{ color:var(--muted); font-size:0.95rem }
 
-  /* Stage panel */
-  .stage-card{
-    background:var(--panel); border-radius:12px; padding:14px;
-    border:1px solid rgba(212,175,55,0.06);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    display:flex; flex-direction:column; align-items:center;
-  }
-
-  .top-info{ width:100%; display:flex; justify-content:space-between; gap:8px; margin-bottom:8px }
-  .stat{ background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; font-weight:700; color:var(--gold) }
-  .small{ color:var(--muted); font-weight:600; font-size:0.9rem }
-
-  /* Canvas responsive */
-  #boardWrap{ width:100%; display:flex; justify-content:center; align-items:center; }
-  canvas{
-    display:block; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.1));
-    border-radius:8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-  }
-
-  /* side panel */
-  .side{
-    display:flex; flex-direction:column; gap:12px;
-    align-items:stretch;
-  }
+  /* main panel */
   .panel{
-    background:var(--panel); padding:12px; border-radius:12px;
-    border:1px solid rgba(212,175,55,0.06);
-  }
-  .panel h3{
-    margin:0 0 8px 0; font-size:1rem; color:var(--gold);
+    background:var(--panel); border-radius:12px; padding:16px; border:1px solid rgba(212,175,55,0.06);
+    box-shadow:0 8px 30px rgba(0,0,0,0.6);
   }
 
-  .previewCanvas{ width:100%; height:120px; background:transparent; display:block; }
+  .game-area{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+    min-height:520px;
+  }
+
+  .groove-grid{
+    width:100%; max-width:520px; display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap:14px;
+    padding:10px;
+  }
+
+  .pad{
+    aspect-ratio: 1.2 / 1;
+    min-height:130px;
+    border-radius:14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));
+    border: 3px solid rgba(212,175,55,0.12);
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-size:2.2rem;
+    color:var(--gold); cursor:pointer; user-select:none; transition: transform 0.12s ease, box-shadow 0.12s;
+    position:relative; overflow:visible;
+  }
+  .pad .label{ position:absolute; bottom:8px; font-size:0.85rem; color:var(--muted); font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+
+  .pad.active{
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(221, 173, 45, 0.18), inset 0 0 24px rgba(255,215,0,0.08);
+    background: radial-gradient(circle at 20% 20%, rgba(255,215,0,0.06), rgba(0,0,0,0.2));
+    color:#000;
+    border-color: rgba(255,215,0,0.9);
+  }
 
   .controls{
-    display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+    display:flex; gap:12px; justify-content:center; margin-top:6px; flex-wrap:wrap;
   }
-  .control-btn{
-    background:#000; color:var(--gold); border:2px solid rgba(212,175,55,0.15);
-    width:64px; height:56px; border-radius:10px; font-weight:900; font-size:1.1rem;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    user-select:none;
+  .btn{
+    background:#000; color:var(--gold);
+    border:2px solid rgba(212,175,55,0.15);
+    padding:10px 14px; border-radius:10px; font-weight:800; cursor:pointer;
   }
-  .control-btn:active{ transform:scale(0.98) }
+  .btn:active{ transform: translateY(2px) }
 
-  .hint{ color:var(--muted); font-size:0.9rem; text-align:center; margin-top:6px }
+  .info{
+    margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  }
+  .stat{
+    background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; color:var(--gold); font-weight:700;
+  }
 
-  /* leaderboard */
-  .lb-row{ display:flex; justify-content:space-between; padding:6px 8px; border-radius:8px; background:linear-gradient(90deg, rgba(255,215,0,0.02), transparent); margin-bottom:6px; font-weight:700 }
-  .footer-note{ color:var(--muted); font-size:0.85rem; margin-top:6px; text-align:center }
+  /* right column */
+  .sidebar{ display:flex; flex-direction:column; gap:12px; }
+
+  .leaderboard{ max-height:300px; overflow:auto; padding:8px; display:flex; flex-direction:column; gap:8px; }
+  .lb-row{ display:flex; justify-content:space-between; padding:8px 10px; border-radius:8px; background:linear-gradient(90deg, rgba(255,215,0,0.02), transparent); font-weight:700 }
+
+  .small{ color:var(--muted); font-size:0.95rem }
+
+  /* particles container */
+  .fx{ position:absolute; inset:0; pointer-events:none; z-index:80; }
+
+  /* modal save */
+  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:9999 }
+  .card{ background:linear-gradient(180deg,#0b0b0b,#070707); padding:18px; border-radius:12px; width:90%; max-width:420px; border:1px solid rgba(255,215,0,0.06) }
 
   /* responsive */
-  @media (max-width:980px){
-    .wrap{ grid-template-columns: 1fr; padding-bottom:40px }
-    .side{ order:2 }
-    .stage-card{ order:1 }
-    header{ flex-direction:column; align-items:flex-start; gap:6px }
+  @media (max-width:900px){
+    .container{ grid-template-columns: 1fr; }
+    .sidebar{ order:2 }
+    .panel{ order:1 }
+    .game-area{ min-height:460px }
   }
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="container">
   <header>
     <div>
-      <div class="brand">Tropiflow Drop</div>
-      <div class="subtitle">Tetris de baile — RSTV Social Dance</div>
+      <div class="brand">Battle Groove</div>
+      <div class="sub">Simon Says — RSTV Social Dance</div>
     </div>
-    <div class="small">Controles: ← → mover · ↑ rotar · ↓ bajar · Espacio hard drop</div>
+    <div class="small">Presiona el patrón que ves, en el orden correcto. Toca para empezar.</div>
   </header>
 
-  <section class="stage-card">
-    <div class="top-info" style="width:100%">
-      <div class="stat" id="scoreStat">Puntaje: 0</div>
-      <div class="stat" id="linesStat">Líneas: 0</div>
-      <div class="stat" id="levelStat">Nivel: 1</div>
-    </div>
+  <section class="panel">
+    <div class="game-area" id="gameArea">
+      <div style="position:relative; width:100%; display:flex; justify-content:center;">
+        <div class="fx" id="fx"></div>
+      </div>
 
-    <div id="boardWrap">
-      <!-- canvas se escala automáticamente -->
-      <canvas id="board"></canvas>
-    </div>
+      <div class="groove-grid" id="grid">
+        <div class="pad" data-key="ArrowUp" id="padUp">↑<div class="label">Arriba</div></div>
+        <div class="pad" data-key="ArrowRight" id="padRight">→<div class="label">Derecha</div></div>
+        <div class="pad" data-key="ArrowLeft" id="padLeft">←<div class="label">Izquierda</div></div>
+        <div class="pad" data-key="ArrowDown" id="padDown">↓<div class="label">Abajo</div></div>
+      </div>
 
-    <div class="hint">Toca los botones o usa el teclado. ¡Haz que Tropiflow arme la coreografía!</div>
-    <div style="margin-top:10px; display:flex; gap:8px">
-      <button id="start" class="control-btn" style="width:auto;padding:8px 16px">Comenzar / Reiniciar</button>
-      <button id="pause" class="control-btn" style="width:auto;padding:8px 16px">Pausa</button>
+      <div class="controls">
+        <button id="startBtn" class="btn">Comenzar</button>
+        <button id="strictBtn" class="btn">Modo Estricto: OFF</button>
+        <button id="soundBtn" class="btn">🔊 Sonido</button>
+      </div>
+
+      <div class="info">
+        <div class="stat" id="roundStat">Ronda: 0</div>
+        <div class="stat" id="lenStat">Longitud: 0</div>
+        <div class="stat" id="bestStat">Récord: 0</div>
+      </div>
+
+      <div class="small" style="text-align:center; margin-top:8px;">Usa teclado o toca las casillas. En modo estricto, un fallo termina la partida.</div>
     </div>
   </section>
 
-  <aside class="side">
+  <aside class="sidebar">
     <div class="panel">
-      <h3>Siguiente</h3>
-      <canvas id="next" class="previewCanvas"></canvas>
-    </div>
-
-    <div class="panel">
-      <h3>Controles táctiles</h3>
-      <div class="controls" id="touchControls">
-        <div class="control-btn" data-action="left">←</div>
-        <div class="control-btn" data-action="rotate">⤴</div>
-        <div class="control-btn" data-action="right">→</div>
-        <div class="control-btn" data-action="down">↓</div>
-        <div class="control-btn" data-action="drop">⤵</div>
+      <h3 style="margin:0;color:var(--gold)">Ranking local</h3>
+      <div class="leaderboard" id="leaderboard">
+        <div class="small">No hay puntajes aun — sé el primero</div>
       </div>
-      <div class="footer-note">Controles táctiles pensados para móvil</div>
-    </div>
-
-    <div class="panel">
-      <h3>Ranking local</h3>
-      <div id="leaderboard">
-        <div class="footer-note">Aún sin puntajes — sé el primero</div>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button id="showSave" class="btn">Guardar puntaje</button>
+        <button id="resetLB" class="btn">Limpiar ranking</button>
       </div>
     </div>
 
     <div class="panel">
-      <h3>Opciones</h3>
-      <div style="display:flex; gap:8px; margin-bottom:8px">
-        <button id="mute" class="control-btn" style="width:48%">🔊</button>
-        <button id="saveScore" class="control-btn" style="width:48%">Guardar</button>
-      </div>
-      <div class="small">Guarda tu puntaje localmente con nombre.</div>
+      <h3 style="margin:0;color:var(--gold)">Instrucciones</h3>
+      <p class="small" style="margin-top:8px">Observa la secuencia (las casillas brillan en dorado), repítela en el mismo orden. Cada ronda añade un paso. Si fallas, pierdes (o vuelves a empezar la ronda en modo normal).</p>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin:0;color:var(--gold)">Opciones</h3>
+      <div style="margin-top:8px" class="small">Velocidad de reproducción y efectos ajustables (se auto-optimiza según tu dispositivo).</div>
     </div>
   </aside>
 </div>
 
-<!-- audio demo -->
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+<!-- save modal -->
+<div id="modalSave" class="modal" role="dialog" aria-modal="true">
+  <div class="card">
+    <h3>Guardar puntaje</h3>
+    <p class="small">Tu puntaje: <strong id="finalPoints">0</strong></p>
+    <input id="playerName" placeholder="Tu nombre" style="width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:#050505; color:#fff">
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button id="saveScoreBtn" class="btn">Guardar</button>
+      <button id="closeSave" class="btn">Cancelar</button>
+    </div>
+  </div>
+</div>
 
+<!-- audio via WebAudio fallback -->
 <script>
-/* Tropiflow Drop — Tetris-like implementation (canvas) */
+/* ======== Battle Groove (Simon Says) - PRO ======== */
 
-/* CONFIG */
-const COLS = 10;
-const ROWS = 20;
-const COLORS = {
-  I: '#56CCF2', J: '#9B59B6', L: '#F2994A', O: '#F2C94C', S: '#6FCF97', T: '#BB6BD9', Z: '#EB5757'
+/* CONFIG & STATE */
+const pads = {
+  ArrowUp: document.getElementById('padUp'),
+  ArrowRight: document.getElementById('padRight'),
+  ArrowLeft: document.getElementById('padLeft'),
+  ArrowDown: document.getElementById('padDown')
 };
-const SHAPES = {
-  I: [[1,1,1,1]],
-  J: [[1,0,0],[1,1,1]],
-  L: [[0,0,1],[1,1,1]],
-  O: [[1,1],[1,1]],
-  S: [[0,1,1],[1,1,0]],
-  T: [[0,1,0],[1,1,1]],
-  Z: [[1,1,0],[0,1,1]]
+const fxLayer = document.getElementById('fx');
+const startBtn = document.getElementById('startBtn');
+const strictBtn = document.getElementById('strictBtn');
+const soundBtn = document.getElementById('soundBtn');
+const roundStat = document.getElementById('roundStat');
+const lenStat = document.getElementById('lenStat');
+const bestStat = document.getElementById('bestStat');
+const leaderboardEl = document.getElementById('leaderboard');
+const showSave = document.getElementById('showSave');
+const resetLB = document.getElementById('resetLB');
+const modalSave = document.getElementById('modalSave');
+const finalPointsEl = document.getElementById('finalPoints');
+const saveScoreBtn = document.getElementById('saveScoreBtn');
+const closeSave = document.getElementById('closeSave');
+const playerNameInput = document.getElementById('playerName');
+
+const LB_KEY = 'rstv_battlegroove_lb_v1';
+let seq = [];         // sequence to follow
+let playerSeq = [];   // what player pressed this round
+let round = 0;
+let playingBack = false;
+let strictMode = false;
+let enabledSound = true;
+let bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+
+bestStat.textContent = `Récord: ${bestScore}`;
+
+/* Audio: use WebAudio to generate tones quickly */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new AudioCtx();
+}
+function playTone(freq, duration=180, gain=0.12){
+  if(!enabledSound) return;
+  ensureAudio();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.value = freq;
+  g.gain.value = gain;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + duration/1000);
+}
+
+/* map pad -> frequency (musical) */
+const soundMap = {
+  ArrowUp: 880,
+  ArrowRight: 659.25,
+  ArrowLeft: 523.25,
+  ArrowDown: 440
 };
-const SCORE_PER = {1:100,2:300,3:500,4:800};
-const STORAGE_KEY = 'rstv_tropiflow_highscores_v1';
 
-/* STATE */
-let canvas = document.getElementById('board');
-let ctx = canvas.getContext('2d');
-let nextCanvas = document.getElementById('next');
-let nctx = nextCanvas.getContext('2d');
+/* helpers: random choice */
+function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-let boardW = 0, boardH = 0, cellSize = 0;
-let grid = [];
-let current = null;
-let nextPiece = null;
-let gameInterval = null;
-let dropInterval = 1000;
-let dropTimer = 0;
-let score = 0, lines = 0, level = 1;
-let running = false;
-let lastTime = 0;
-let music = document.getElementById('music');
-let muted = false;
-
-/* util */
-function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function rotateMatrix(m){ // clockwise
-  const H = m.length, W = m[0].length;
-  const res = Array.from({length:W}, ()=>Array(H).fill(0));
-  for(let r=0;r<H;r++) for(let c=0;c<W;c++) res[c][H-1-r] = m[r][c];
-  return res;
-}
-
-/* initialize grid */
-function resetGrid(){
-  grid = Array.from({length:ROWS}, ()=>Array(COLS).fill(null));
-}
-
-/* pieces */
-function createPiece(type){
-  const shape = SHAPES[type].map(r => r.slice());
-  return {type, shape, x: Math.floor((COLS - shape[0].length)/2), y: -shape.length};
-}
-function spawnPiece(){
-  current = nextPiece || createPiece(randChoice(Object.keys(SHAPES)));
-  nextPiece = createPiece(randChoice(Object.keys(SHAPES)));
-  // if immediate collision -> game over
-  if(collides(current,0,0)) {
-    endGame();
-  }
-}
-
-/* collisions */
-function collides(piece, dx=0, dy=0, rotatedShape=null){
-  const shape = rotatedShape || piece.shape;
-  for(let r=0;r<shape.length;r++){
-    for(let c=0;c<shape[r].length;c++){
-      if(!shape[r][c]) continue;
-      const newX = piece.x + c + dx;
-      const newY = piece.y + r + dy;
-      if(newX < 0 || newX >= COLS || newY >= ROWS) return true;
-      if(newY >= 0 && grid[newY][newX]) return true;
-    }
-  }
-  return false;
-}
-
-/* lock piece */
-function lockPiece(){
-  const s = current.shape;
-  for(let r=0;r<s.length;r++){
-    for(let c=0;c<s[r].length;c++){
-      if(s[r][c]){
-        const gx = current.x + c;
-        const gy = current.y + r;
-        if(gy >= 0 && gy < ROWS && gx >= 0 && gx < COLS){
-          grid[gy][gx] = current.type;
-        }
-      }
-    }
-  }
-  clearLines();
-  spawnPiece();
-}
-
-/* clear lines */
-function clearLines(){
-  let cleared = 0;
-  for(let r=ROWS-1;r>=0;r--){
-    if(grid[r].every(cell => cell !== null)){
-      grid.splice(r,1);
-      grid.unshift(Array(COLS).fill(null));
-      cleared++;
-      r++; // recheck same index after splice
-    }
-  }
-  if(cleared>0){
-    lines += cleared;
-    score += (SCORE_PER[cleared] || cleared*100) * level;
-    // level up per 10 lines
-    const newLevel = Math.floor(lines / 10) + 1;
-    if(newLevel > level){
-      level = newLevel;
-      // speed up
-      dropInterval = Math.max(120, 1000 - (level-1)*80);
-    }
-    updateHUD();
-    // particle explosion (bonus)
-    spawnBigExplosion();
-  }
-}
-
-/* movement */
-function move(dx, dy){
-  if(!current) return;
-  if(!collides(current, dx, dy)){
-    current.x += dx; current.y += dy;
-    return true;
-  }
-  return false;
-}
-function softDrop(){
-  if(!move(0,1)){
-    // if can't move down -> lock
-    lockPiece();
-  } else {
-    score += 1;
-    updateHUD();
-  }
-}
-function hardDrop(){
-  let dropped = 0;
-  while(move(0,1)){ dropped++; }
-  score += dropped * 2;
-  lockPiece();
-  updateHUD();
-}
-function rotate(){
-  const rotated = rotateMatrix(current.shape);
-  if(!collides(current,0,0,rotated)){
-    current.shape = rotated;
-  } else {
-    // try wall kick simple variants
-    if(!collides(current,-1,0,rotated)) current.x -=1, current.shape = rotated;
-    else if(!collides(current,1,0,rotated)) current.x +=1, current.shape = rotated;
-  }
-}
-
-/* draw */
-function fitCanvas(){
-  const wrap = document.getElementById('boardWrap');
-  const maxW = Math.min(wrap.clientWidth, 520);
-  // choose cell size to fit ROWS x COLS within available area, with margins
-  const margin = 16;
-  const availW = Math.min(maxW, window.innerWidth - 120);
-  cellSize = Math.floor((availW - margin) / COLS);
-  boardW = cellSize * COLS;
-  boardH = cellSize * ROWS;
-  canvas.width = boardW;
-  canvas.height = boardH;
-  canvas.style.width = boardW + 'px';
-  canvas.style.height = boardH + 'px';
-  // next canvas
-  nextCanvas.width = 140; nextCanvas.height = 140;
-}
-function draw(){
-  // clear
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  // background grid faint
-  ctx.fillStyle = '#070707'; ctx.fillRect(0,0,canvas.width,canvas.height);
-  // draw placed
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const cell = grid[r][c];
-      if(cell){
-        drawCell(c,r,COLORS[cell]);
-      } else {
-        // grid lines subtle
-        ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(c*cellSize + 0.5, r*cellSize + 0.5, cellSize-1, cellSize-1);
-      }
-    }
-  }
-  // draw current piece
-  if(current){
-    for(let r=0;r<current.shape.length;r++){
-      for(let c=0;c<current.shape[r].length;c++){
-        if(current.shape[r][c]){
-          const gx = current.x + c, gy = current.y + r;
-          if(gy >= 0){
-            drawCell(gx, gy, COLORS[current.type], true);
-          }
-        }
-      }
-    }
-  }
-  // draw ghost (projection)
-  drawGhost();
-
-  // draw next piece preview
-  drawNext();
-}
-function drawCell(cx, cy, color, withHighlight=false){
-  const x = cx * cellSize;
-  const y = cy * cellSize;
-  // main block
-  ctx.fillStyle = color;
-  ctx.fillRect(x+2, y+2, cellSize-4, cellSize-4);
-  // inner shading
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = 'rgba(255,255,255,0.06)';
-  ctx.fillRect(x+4, y+4, cellSize-8, cellSize/3);
-  // border
-  ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(x+2.5, y+2.5, cellSize-5, cellSize-5);
-  // highlight glow when withHighlight
-  if(withHighlight){
-    ctx.strokeStyle = 'rgba(255,215,0,0.5)';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(x+1, y+1, cellSize-2, cellSize-2);
-  }
-}
-function drawGhost(){
-  if(!current) return;
-  // clone
-  const ghost = {shape: current.shape.map(r => r.slice()), x: current.x, y: current.y};
-  while(!collides(ghost,0,1)){
-    ghost.y +=1;
-  }
-  // draw with low alpha
-  for(let r=0;r<ghost.shape.length;r++){
-    for(let c=0;c<ghost.shape[r].length;c++){
-      if(ghost.shape[r][c]){
-        const gx = ghost.x + c, gy = ghost.y + r;
-        if(gy >= 0){
-          const x = gx*cellSize, y = gy*cellSize;
-          ctx.fillStyle = 'rgba(255,215,0,0.08)';
-          ctx.fillRect(x+2, y+2, cellSize-4, cellSize-4);
-        }
-      }
-    }
-  }
-}
-function drawNext(){
-  const s = nextPiece ? nextPiece.shape : [[0]];
-  nctx.clearRect(0,0,nextCanvas.width,nextCanvas.height);
-  nctx.fillStyle='transparent';
-  // center drawing
-  const cs = 20;
-  nctx.translate(0,0);
-  const offsetX = (nextCanvas.width - s[0].length*cs)/2;
-  const offsetY = (nextCanvas.height - s.length*cs)/2;
-  for(let r=0;r<s.length;r++){
-    for(let c=0;c<s[r].length;c++){
-      if(s[r][c]){
-        nctx.fillStyle = COLORS[nextPiece.type];
-        nctx.fillRect(offsetX + c*cs + 4, offsetY + r*cs + 4, cs-8, cs-8);
-      }
-    }
-  }
-}
-
-/* ghost slows scaling restore for next draw */
-function resetNextTransform(){ nctx.setTransform(1,0,0,1,0,0); }
-
-/* game loop with delta timing */
-function loop(ts){
-  if(!lastTime) lastTime = ts;
-  const delta = ts - lastTime;
-  lastTime = ts;
-  if(running){
-    dropTimer += delta;
-    if(dropTimer >= dropInterval){
-      dropTimer = 0;
-      if(current){
-        if(!move(0,1)){
-          // cannot move -> lock
-          lockPiece();
-        }
-      }
-    }
-    draw();
-  }
-  requestAnimationFrame(loop);
-}
-
-/* HUD */
-function updateHUD(){ 
-  document.getElementById('scoreStat').textContent = `Puntaje: ${score}`;
-  document.getElementById('linesStat').textContent = `Líneas: ${lines}`;
-  document.getElementById('levelStat').textContent = `Nivel: ${level}`;
-}
-
-/* spawn big visual explosion temporary */
-function spawnBigExplosion(){
-  // small visual flair in DOM: we can animate canvas overlay if needed
-  // currently handled within particle spawn on hits and clear lines
-}
-
-/* start/stop */
-function startGame(){
-  resetGrid();
-  score = 0; lines = 0; level = 1;
-  dropInterval = 1000;
-  score = 0;
-  updateHUD();
-  nextPiece = createPiece(randChoice(Object.keys(SHAPES)));
-  spawnPiece();
-  running = true;
-  lastTime = 0; dropTimer = 0;
-  // Audio play attempt (must be triggered by user gesture which Start button is)
-  if(!muted){
-    try{ music.currentTime = 0; music.volume = 0.6; music.play(); }catch(e){}
-  }
-  requestAnimationFrame(loop);
-}
-
-function endGame(){
-  running = false;
-  // show prompt to save score
-  const name = prompt(`Juego terminado. Puntaje: ${score}\nIngresa tu nombre para guardar (o cancelar):`);
-  if(name !== null && name.trim() !== ''){
-    saveScore(name.trim(), score);
-    renderLeaderboard();
-  }
-  // reset current to allow restart
-  current = null;
-  nextPiece = null;
-  draw();
-}
-
-/* controls binding */
-document.getElementById('start').addEventListener('click', ()=> {
-  startGame();
-});
-document.getElementById('pause').addEventListener('click', ()=> {
-  running = !running;
-  if(running) { lastTime=0; requestAnimationFrame(loop); }
-});
-
-document.addEventListener('keydown', (e)=> {
-  if(!running) return;
-  if(e.key === 'ArrowLeft'){ move(-1,0); draw(); }
-  else if(e.key === 'ArrowRight'){ move(1,0); draw(); }
-  else if(e.key === 'ArrowDown'){ softDrop(); draw(); }
-  else if(e.key === 'ArrowUp'){ rotate(); draw(); }
-  else if(e.code === 'Space'){ hardDrop(); draw(); }
-});
-
-document.querySelectorAll('#touchControls .control-btn').forEach(btn=>{
-  btn.addEventListener('touchstart', (ev)=>{ ev.preventDefault(); const act = btn.dataset.action; touchAction(act); }, {passive:false});
-  btn.addEventListener('mousedown', ()=>{ touchAction(btn.dataset.action); });
-});
-
-function touchAction(act){
-  if(!running) return;
-  if(act === 'left') move(-1,0);
-  else if(act === 'right') move(1,0);
-  else if(act === 'down') softDrop();
-  else if(act === 'rotate') rotate();
-  else if(act === 'drop') hardDrop();
-  draw();
-}
-
-/* next & spawn / collision used earlier */
-function updateScaleAndDraw(){
-  fitCanvas();
-  draw();
-  resetNextTransform();
-}
-
-/* leaderboard local */
-function loadLB(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){ return [] } }
-function saveLB(lb){ localStorage.setItem(STORAGE_KEY, JSON.stringify(lb.slice(0,10))); }
-function saveScore(name, pts){
+/* leaderboard functions */
+function loadLB(){ try{ return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }catch(e){ return [] } }
+function saveLB(lb){ localStorage.setItem(LB_KEY, JSON.stringify(lb.slice(0,10))); }
+function addToLB(name, pts){
   const lb = loadLB();
-  lb.push({name, pts, date: Date.now()});
+  lb.push({name, pts, at: Date.now()});
   lb.sort((a,b)=>b.pts - a.pts);
   saveLB(lb);
+  renderLB();
 }
-function renderLeaderboard(){
-  const container = document.getElementById('leaderboard');
+function renderLB(){
   const lb = loadLB();
-  if(lb.length === 0){ container.innerHTML = '<div class="footer-note">Aún no hay puntajes — sé el primero!</div>'; return; }
-  container.innerHTML = '';
-  lb.slice(0,5).forEach((row, i)=>{
-    const div = document.createElement('div');
-    div.className = 'lb-row';
-    div.innerHTML = `<div>${i+1}. ${row.name}</div><div>${row.pts}</div>`;
-    container.appendChild(div);
+  leaderboardEl.innerHTML = '';
+  if(lb.length === 0){ leaderboardEl.innerHTML = '<div class="small">Sin puntajes — sé el primero</div>'; return; }
+  lb.slice(0,10).forEach((r, idx)=>{
+    const row = document.createElement('div'); row.className='lb-row';
+    row.innerHTML = `<div>${idx+1}. ${r.name}</div><div>${r.pts}</div>`;
+    leaderboardEl.appendChild(row);
   });
 }
+renderLB();
 
-/* responsive: resize handling */
-window.addEventListener('resize', ()=> { updateScaleAndDraw(); });
-window.addEventListener('orientationchange', ()=> { updateScaleAndDraw(); });
+/* visual particle when pad lights up */
+function spawnParticleAt(el){
+  const rect = el.getBoundingClientRect();
+  const parentRect = fxLayer.parentElement.getBoundingClientRect();
+  const x = rect.left + rect.width/2 - parentRect.left;
+  const y = rect.top + rect.height/2 - parentRect.top;
+  for(let i=0;i<10;i++){
+    const p = document.createElement('div');
+    p.style.position='absolute';
+    p.style.left = x + (Math.random()*40-20) + 'px';
+    p.style.top = y + (Math.random()*40-20) + 'px';
+    p.style.width = '10px'; p.style.height='10px'; p.style.borderRadius='50%';
+    p.style.background = `radial-gradient(circle, ${getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#ffd700'}, ${getComputedStyle(document.documentElement).getPropertyValue('--gold-2') || '#b8860b'})`;
+    p.style.opacity = 1; p.style.zIndex = 99;
+    p.style.transform = `translate(0,0) scale(1)`;
+    fxLayer.appendChild(p);
+    // animate
+    const tx = (Math.random()*120 - 60), ty = (Math.random()*-140 - 20);
+    p.animate([{transform:'translate(0,0) scale(1)', opacity:1},{transform:`translate(${tx}px,${ty}px) scale(0.2)`, opacity:0}], {duration:700 + Math.random()*300, easing:'cubic-bezier(.2,.9,.2,1)'});
+    setTimeout(()=>p.remove(), 1100);
+  }
+}
 
-/* save button & mute */
-document.getElementById('saveScore').addEventListener('click', ()=>{
-  const name = prompt('Ingresa nombre para guardar puntaje:');
-  if(name) { saveScore(name, score); renderLeaderboard(); alert('Guardado!'); }
+/* flash pad visually & play tone */
+function flashPad(key){
+  const el = pads[key];
+  if(!el) return;
+  el.classList.add('active');
+  spawnParticleAt(el);
+  if(enabledSound) playTone(soundMap[key], 220, 0.12);
+  setTimeout(()=>el.classList.remove('active'), 220);
+}
+
+/* play sequence back to player with timing that speeds up gradually */
+function playbackSequence(seqArr){
+  playingBack = true;
+  let idx = 0;
+  const baseDelay = Math.max(400 - Math.floor(seqArr.length * 6), 180); // speeds up as sequence grows
+  function step(){
+    if(idx >= seqArr.length){
+      playingBack = false;
+      return;
+    }
+    const k = seqArr[idx];
+    flashPad(k);
+    idx++;
+    setTimeout(step, baseDelay);
+  }
+  setTimeout(step, 600);
+}
+
+/* add a random step and play */
+function addStepAndPlay(){
+  const keysList = Object.keys(pads);
+  const next = choice(keysList);
+  seq.push(next);
+  round = seq.length;
+  updateStats();
+  playbackSequence(seq);
+}
+
+/* update UI stats */
+function updateStats(){
+  roundStat.textContent = `Ronda: ${round}`;
+  lenStat.textContent = `Longitud: ${seq.length}`;
+  bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+  bestStat.textContent = `Récord: ${bestScore}`;
+}
+
+/* on player input */
+function playerPress(key){
+  if(playingBack) return; // ignore inputs during playback
+  if(!seq.length) return;
+  // register
+  playerSeq.push(key);
+  // visual & sound
+  flashPad(key);
+  // validate immediate correct step
+  const i = playerSeq.length - 1;
+  if(playerSeq[i] !== seq[i]){
+    // fail
+    onFail();
+    return;
+  }
+  // if completed sequence
+  if(playerSeq.length === seq.length){
+    // success: short celebration, then next round
+    // award points: length^2 maybe
+    const gained = 10 + seq.length * 4;
+    score += gained;
+    // update best
+    if(score > bestScore) {
+      bestScore = score;
+      localStorage.setItem('battlegroove_best', bestScore);
+    }
+    updateStats();
+    // small explosion
+    bigSuccess();
+    // reset playerSeq and add new step after a small pause
+    playerSeq = [];
+    setTimeout(()=> addStepAndPlay(), 700);
+  }
+}
+
+/* fail behavior */
+let score = 0;
+function onFail(){
+  // visual shake & red flash, sound buzz
+  const gameArea = document.getElementById('gameArea');
+  gameArea.animate([{transform:'translateX(0)'},{transform:'translateX(-12px)'},{transform:'translateX(12px)'},{transform:'translateX(0)'}], {duration:420});
+  // low buzz sound
+  if(enabledSound){
+    ensureAudio();
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.frequency.value = 120; o.type='sawtooth'; g.gain.value = 0.1;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.18);
+  }
+  // if strict, end game; else replay same round (player gets another try)
+  if(strictMode){
+    endRound();
+  } else {
+    playerSeq = [];
+    // replay sequence for retry
+    setTimeout(()=> playbackSequence(seq), 700);
+  }
+}
+
+/* success big effect */
+function bigSuccess(){
+  // golden burst center
+  const center = document.createElement('div');
+  center.style.position='absolute'; center.style.left='50%'; center.style.top='30%';
+  center.style.transform='translate(-50%,-50%)'; center.style.width='220px'; center.style.height='220px';
+  center.style.borderRadius='50%'; center.style.background='radial-gradient(circle, rgba(255,215,0,0.85), rgba(255,215,0,0.2) 30%, transparent 55%)';
+  center.style.zIndex = 200; center.style.pointerEvents='none';
+  fxLayer.appendChild(center);
+  center.animate([{opacity:1, transform:'translate(-50%,-50%) scale(0.6)'},{opacity:0, transform:'translate(-50%,-50%) scale(1.2)'}], {duration:700, easing:'cubic-bezier(.2,.9,.2,1)'});
+  setTimeout(()=> center.remove(), 750);
+}
+
+/* game lifecycle */
+function startGame(){
+  seq = []; playerSeq = []; round = 0; score = 0;
+  updateStats();
+  addStepAndPlay();
+  // reset score UI stored on local
+  updateScoreStat();
+}
+function endRound(){
+  // show save modal for score
+  finalPointsEl.textContent = score;
+  modalSave.style.display = 'flex';
+}
+
+/* score UI */
+function updateScoreStat(){
+  document.getElementById('scoreBox')?.remove?.(); // no-op safe
+  // We reflect score in lenStat or additional stat; for now bestStat and roundStat updated
+}
+
+/* big success helper: spawn many particles */
+function spawnManyParticlesForPad(key){
+  const el = pads[key];
+  if(!el) return;
+  spawnParticleAt(el);
+  // extra flash
+  el.classList.add('active');
+  setTimeout(()=>el.classList.remove('active'), 250);
+}
+
+/* event bindings */
+Object.keys(pads).forEach(k=>{
+  pads[k].addEventListener('mousedown', ()=>{ if(!playingBack) playerPress(k); });
+  pads[k].addEventListener('touchstart', (e)=>{ e.preventDefault(); if(!playingBack) playerPress(k); }, {passive:false});
 });
-document.getElementById('mute').addEventListener('click', ()=>{
-  muted = !muted;
-  if(muted) { music.pause(); document.getElementById('mute').textContent = '🔇'; }
-  else { try{ music.play(); }catch{}; document.getElementById('mute').textContent = '🔊'; }
+
+/* keyboard */
+document.addEventListener('keydown', (e)=>{
+  if(Object.keys(pads).includes(e.key)){
+    if(!playingBack) playerPress(e.key);
+  }
 });
 
-/* initial layout & spawn */
-resetGrid();
-updateScaleAndDraw();
-renderLeaderboard();
-
-/* expose functions: spawnPiece when starting */
-function gameTickAdd(){ /* placeholder */ }
-
-/* small helper to spawn initial next and start when clicking start */
-document.getElementById('start').addEventListener('click', ()=>{
-  // prepare next preview before spawning
-  nextPiece = createPiece(randChoice(Object.keys(SHAPES)));
-  spawnPiece();
+/* controls */
+startBtn.addEventListener('click', ()=>{
+  // ensure audio context created on user gesture for mobile
+  ensureAudio();
   startGame();
 });
+strictBtn.addEventListener('click', ()=>{
+  strictMode = !strictMode;
+  strictBtn.textContent = `Modo Estricto: ${strictMode ? 'ON' : 'OFF'}`;
+});
+soundBtn.addEventListener('click', ()=>{
+  enabledSound = !enabledSound;
+  soundBtn.textContent = enabledSound ? '🔊 Sonido' : '🔇 Silencio';
+});
 
-/* ensure nextPiece exists if user opens without pressing start */
-nextPiece = createPiece(randChoice(Object.keys(SHAPES)));
-spawnPiece();
+/* modal save */
+closeSave.addEventListener('click', ()=> modalSave.style.display='none');
+saveScoreBtn.addEventListener('click', ()=>{
+  const name = playerNameInput.value.trim() || 'Jugador';
+  addToLB(name, score);
+  modalSave.style.display='none';
+  // update best
+  bestScore = Number(localStorage.getItem('battlegroove_best') || 0);
+  bestStat.textContent = `Récord: ${bestScore}`;
+});
 
-/* end of script */
+/* show save button handling */
+showSave.addEventListener('click', ()=>{
+  finalPointsEl.textContent = score;
+  modalSave.style.display='flex';
+});
+
+/* reset leaderboard */
+resetLB.addEventListener('click', ()=>{
+  if(confirm('¿Limpiar ranking local?')) { localStorage.removeItem(LB_KEY); renderLB(); }
+});
+
+/* initialize UI */
+updateStats();
+renderLB();
+
+/* expose small debug hook */
+window._battlegroove = { startGame, seq };
+
 </script>
 </body>
 </html>
-
 <!--
 JUEGO DE FLECHAS QUE CAEN 
 <!DOCTYPE html>
