@@ -430,6 +430,311 @@
       <h1>Juego</h1>
       <p>Pega aquí tu juego de baile interactivo.</p>
       <!-- 🔽 Pega tu juego aquí -->
+      <style>
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg,#000,#111);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+h1 {
+  margin-top: 20px;
+  text-align: center;
+  background: linear-gradient(90deg,#d4af37,#b8860b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#game {
+  position: relative;
+  width: 90%;
+  max-width: 360px;
+  height: 500px;
+  background: rgba(0,0,0,0.85);
+  border: 2px solid #d4af37;
+  margin-top: 20px;
+  overflow: hidden;
+}
+.hit-zone {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: space-around;
+}
+.socket {
+  width: 22%;
+  max-width: 60px;
+  height: 50px;
+  border: 2px dashed #d4af37;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4af37;
+  font-size: 1.5rem;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.socket.active {
+  background: #ffd700;
+  box-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700;
+  color: #000;
+  transform: scale(1.2);
+}
+.arrow {
+  width: 22%;
+  max-width: 60px;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #d4af37;
+  border: 2px solid #b8860b;
+  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  transition: top 0.02s linear, transform 0.2s ease;
+}
+.arrow.hit {
+  animation: hitFlash 0.3s forwards;
+}
+@keyframes hitFlash {
+  0% { transform: scale(1); color: #d4af37;}
+  50% { transform: scale(1.5); color: #fff;}
+  100% { transform: scale(1); color: #d4af37;}
+}
+.particles {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle,#ffd700,#b8860b);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.8;
+  animation: particleMove 0.8s forwards;
+}
+@keyframes particleMove {
+  0% { transform: translateY(0) scale(1);}
+  100% { transform: translateY(-50px) translateX(30px) scale(0); opacity: 0;}
+}
+#score {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  color: #d4af37;
+}
+#comboDisplay {
+  position: absolute;
+  top: 25%;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 15px #ffd700;
+  display: none;
+}
+#controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+#controls button {
+  width: 60px;
+  height: 60px;
+  font-size: 2rem;
+  background: #000;
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+  color: #d4af37;
+  font-weight: bold;
+  transition: transform 0.1s ease, background 0.2s;
+}
+#controls button:active {
+  transform: scale(1.2);
+  background: #ffd700;
+  color: #000;
+}
+#startBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  background: #000;
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  border-radius: 10px;
+}
+#startBtn:hover {cursor: pointer;}
+</style>
+</head>
+<body>
+
+<h1>RSTV Social Dance 5.0 Showtime</h1>
+
+<button id="startBtn">¡Comenzar Juego!</button>
+
+<div id="game">
+  <div class="hit-zone">
+    <div class="socket" data-key="ArrowUp">↑</div>
+    <div class="socket" data-key="ArrowDown">↓</div>
+    <div class="socket" data-key="ArrowLeft">←</div>
+    <div class="socket" data-key="ArrowRight">→</div>
+  </div>
+  <div id="comboDisplay">COMBO!</div>
+</div>
+<div id="score">Puntaje: 0 | Combo: 0 | Récord: 0</div>
+
+<div id="controls">
+  <button data-key="ArrowUp">↑</button>
+  <button data-key="ArrowDown">↓</button>
+  <button data-key="ArrowLeft">←</button>
+  <button data-key="ArrowRight">→</button>
+</div>
+
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+
+<script>
+const game = document.getElementById("game");
+const scoreDisplay = document.getElementById("score");
+const comboDisplay = document.getElementById("comboDisplay");
+const sockets = document.querySelectorAll(".socket");
+const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
+const symbols = ["↑","↓","←","→"];
+let arrows = [];
+let score = 0;
+let combo = 0;
+let speed = 3;
+let intervalCreate = 1000;
+let record = localStorage.getItem("danceRecord") || 0;
+let gameStarted = false;
+const music = document.getElementById("music");
+
+const hitStart = game.clientHeight - 80;
+const hitEnd = game.clientHeight - 30;
+
+// Parámetros BPM (beats por minuto)
+const BPM = 120; // Ajusta según la canción
+const msPerBeat = 60000 / BPM;
+
+document.getElementById("startBtn").addEventListener("click", () => {
+  if(!gameStarted){
+    music.play();
+    gameStarted = true;
+    arrowLoop();
+    document.getElementById("startBtn").style.display="none";
+  }
+});
+
+function createArrow(){
+  const index = Math.floor(Math.random()*4);
+  const key = keys[index];
+  const symbol = symbols[index];
+  const arrow = document.createElement("div");
+  arrow.classList.add("arrow");
+  arrow.textContent = symbol;
+  arrow.dataset.key = key;
+  const socketRect = sockets[index].getBoundingClientRect();
+  const gameRect = game.getBoundingClientRect();
+  arrow.style.left = socketRect.left - gameRect.left + "px";
+  arrow.style.top = "-60px";
+  game.appendChild(arrow);
+  arrows.push(arrow);
+}
+
+function moveArrows(){
+  arrows.forEach((arrow,i)=>{
+    let top = parseInt(arrow.style.top);
+    arrow.style.top = top + speed + "px";
+    if(top > game.clientHeight){
+      game.removeChild(arrow);
+      arrows.splice(i,1);
+      combo = 0;
+      updateComboDisplay();
+      score -= 5;
+      updateScore();
+    }
+  });
+}
+
+function createParticles(x, y){
+  for(let i=0;i<12;i++){
+    const p = document.createElement("div");
+    p.classList.add("particles");
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+    game.appendChild(p);
+    setTimeout(()=>p.remove(),800);
+  }
+}
+
+function checkArrow(keyPressed){
+  arrows.forEach((arrow,i)=>{
+    let top = parseInt(arrow.style.top);
+    if(keyPressed === arrow.dataset.key && top >= hitStart && top <= hitEnd){
+      arrow.classList.add("hit");
+      setTimeout(()=>arrow.remove(),300);
+      arrows.splice(i,1);
+      score += 10 + combo*2;
+      combo +=1;
+      updateScore();
+      updateComboDisplay();
+      const index = keys.indexOf(keyPressed);
+      const socket = sockets[index];
+      createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
+      socket.classList.add("active");
+      setTimeout(()=>socket.classList.remove("active"),200);
+      speed += 0.05;
+      if(intervalCreate>400) intervalCreate -=5;
+      if(score>record){
+        record = score;
+        localStorage.setItem("danceRecord", record);
+      }
+    }
+  });
+}
+
+function updateComboDisplay(){
+  if(combo>=3){
+    comboDisplay.style.display="block";
+    comboDisplay.textContent = COMBO x${combo}!;
+    comboDisplay.style.opacity=1;
+    setTimeout(()=>comboDisplay.style.opacity=0,400);
+  }else{
+    comboDisplay.style.display="none";
+  }
+}
+
+document.addEventListener("keydown",(e)=>{
+  checkArrow(e.key);
+});
+
+const controlButtons = document.querySelectorAll("#controls button");
+controlButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    checkArrow(btn.dataset.key);
+  });
+});
+
+function updateScore(){
+  scoreDisplay.textContent = Puntaje: ${score} | Combo: ${combo} | Récord: ${record};
+}
+
+// Loop de movimiento
+setInterval(moveArrows,20);
+
+// Loop de creación sincronizada al BPM
+function arrowLoop(){
+  if(gameStarted){
+    createArrow();
+    setTimeout(arrowLoop, msPerBeat);
+  }
+}
+</script>
+
+
       <div id="contenedor-juego"></div>
     </section>
 
