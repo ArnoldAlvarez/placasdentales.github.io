@@ -3,30 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payasita Run — RSTV</title>
+<title>Payasita Run Vertical — RSTV</title>
 <style>
-  :root{
-    --bg:#070707;
-    --gold:#d4af37;
-    --gold-dark:#b8860b;
-    --panel:rgba(0,0,0,0.85);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:linear-gradient(180deg,#050505,#0a0a0a); font-family:sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; color:#fff;}
-  
-  #gameContainer{
-    position:relative; width:100%; max-width:900px; height:500px; background:var(--panel); border-radius:12px; overflow:hidden; border:2px solid var(--gold); box-shadow:0 8px 30px rgba(0,0,0,0.6);
-  }
+:root{
+  --bg:#070707;
+  --gold:#d4af37;
+  --gold-dark:#b8860b;
+  --panel:rgba(0,0,0,0.85);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background: linear-gradient(180deg,#050505,#0a0a0a);
+  font-family:sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
+  color:#fff;
+}
+#gameContainer{
+  position:relative;
+  width:100%;
+  max-width:400px;
+  height:700px;
+  background: var(--panel);
+  border-radius:12px;
+  overflow:hidden;
+  border:2px solid var(--gold);
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+}
+canvas{display:block;width:100%;height:100%;}
 
-  canvas{display:block; width:100%; height:100%;}
-
-  .controls{
-    position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:12px;
-  }
-  .btn{
-    padding:10px 14px; border-radius:10px; border:none; font-weight:700; cursor:pointer; background:#000; color:var(--gold);
-  }
-  .btn:active{transform:translateY(2px);}
+.controls{
+  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+  display:flex; gap:12px;
+}
+.btn{
+  padding:12px 16px; border-radius:12px; border:none;
+  font-weight:700; cursor:pointer; background:#000; color:var(--gold);
+}
+.btn:active{transform:translateY(2px);}
 </style>
 </head>
 <body>
@@ -36,185 +53,164 @@
   <div class="controls">
     <button id="startBtn" class="btn">Comenzar</button>
     <button id="musicBtn" class="btn">🎵 Música</button>
+    <button id="jumpBtn" class="btn">↑ Salto</button>
+    <button id="duckBtn" class="btn">↓ Agacharse</button>
   </div>
 </div>
 
 <script>
+// === Configuración ===
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 let width = canvas.width = canvas.offsetWidth;
 let height = canvas.height = canvas.offsetHeight;
 
-// game state
-let gameRunning = false;
-let obstacles = [];
-let items = [];
-let score = 0;
-let speed = 4;
-let gravity = 0.6;
-let jumpForce = -12;
+// Game state
+let gameRunning=false;
+let obstacles=[], items=[];
+let score=0, speed=4;
+let gravity=0.6, jumpForce=-14;
 
-// payasita sprite
+// Payasita sprite de ejemplo (horizontal)
 const sprite = new Image();
-sprite.src = 'https://i.ibb.co/0yZ0bQw/payasita-sprite.png'; // placeholder sprite URL, reemplaza por tu sprite
-let spriteFrame = 0;
-const spriteFrameCount = 4;
-let spriteX = 80;
+sprite.src = 'https://i.ibb.co/0yZ0bQw/payasita-sprite.png'; // placeholder
+let spriteFrame=0;
+const spriteFrameCount=4;
+let spriteX = width/2 - 32;
 let spriteY = height - 120;
 let spriteVY = 0;
-let spriteWidth = 64;
-let spriteHeight = 64;
+let spriteWidth=64, spriteHeight=64;
+let ducking=false;
 
-// keys
-const keys = {ArrowUp:false, ArrowDown:false};
+// Controles
+const keys={ArrowUp:false, ArrowDown:false};
+document.addEventListener('keydown', e=>{ if(keys.hasOwnProperty(e.key)) keys[e.key]=true; });
+document.addEventListener('keyup', e=>{ if(keys.hasOwnProperty(e.key)) keys[e.key]=false; });
 
-// particles
-let particles = [];
+// Botones táctiles
+document.getElementById('jumpBtn').addEventListener('mousedown', ()=> keys.ArrowUp=true);
+document.getElementById('jumpBtn').addEventListener('mouseup', ()=> keys.ArrowUp=false);
+document.getElementById('duckBtn').addEventListener('mousedown', ()=> keys.ArrowDown=true);
+document.getElementById('duckBtn').addEventListener('mouseup', ()=> keys.ArrowDown=false);
+document.getElementById('jumpBtn').addEventListener('touchstart', ()=> keys.ArrowUp=true,{passive:false});
+document.getElementById('jumpBtn').addEventListener('touchend', ()=> keys.ArrowUp=false,{passive:false});
+document.getElementById('duckBtn').addEventListener('touchstart', ()=> keys.ArrowDown=true,{passive:false});
+document.getElementById('duckBtn').addEventListener('touchend', ()=> keys.ArrowDown=false,{passive:false});
 
-// music
-let audioCtx = null;
-let musicPlaying = false;
-const musicBtn = document.getElementById('musicBtn');
+// Partículas
+let particles=[];
+function spawnParticles(x,y){
+    for(let i=0;i<15;i++){
+        particles.push({x,y,vx:(Math.random()-0.5)*6,vy:(Math.random()-1.5)*-6,size:Math.random()*6+2,alpha:1});
+    }
+}
 
+// Obstáculos e items
+function Obstacle(x,y,w,h){this.x=x; this.y=y; this.w=w; this.h=h;}
+function Item(x,y,size){this.x=x; this.y=y; this.size=size;}
+
+// Música
+let audioCtx=null; let musicPlaying=false;
+const musicBtn=document.getElementById('musicBtn');
 musicBtn.addEventListener('click', ()=>{
     if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     musicPlaying = !musicPlaying;
     musicBtn.textContent = musicPlaying?'🔇 Música':'🎵 Música';
 });
 
-// controls
-document.addEventListener('keydown', e=>{ if(keys.hasOwnProperty(e.key)) keys[e.key]=true; });
-document.addEventListener('keyup', e=>{ if(keys.hasOwnProperty(e.key)) keys[e.key]=false; });
-
-// touch controls
-canvas.addEventListener('touchstart', e=>{
-    let t = e.touches[0];
-    if(t.clientY < height/2) keys.ArrowUp=true;
-    else keys.ArrowDown=true;
-});
-canvas.addEventListener('touchend', e=>{ keys.ArrowUp=false; keys.ArrowDown=false; });
-
-// start button
-document.getElementById('startBtn').addEventListener('click', ()=>{startGame();});
-
-// resize
+// Resize
 window.addEventListener('resize', ()=>{
     width = canvas.width = canvas.offsetWidth;
     height = canvas.height = canvas.offsetHeight;
 });
 
-// obstacle constructor
-function Obstacle(x, y, w, h){
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-}
-function Item(x, y, size){this.x=x; this.y=y; this.size=size;}
+// Start
+document.getElementById('startBtn').addEventListener('click', ()=> startGame());
 
-// game loop
+// Generar obstáculos e items
+let frameCount=0;
+function spawnObstacle(){ obstacles.push(new Obstacle(Math.random()*(width-40), -40, 40, 40)); }
+function spawnItem(){ items.push(new Item(Math.random()*(width-30), -30, 20)); }
+
+// Loop
 function startGame(){
-    gameRunning = true;
+    gameRunning=true;
     score=0; obstacles=[]; items=[];
-    spriteY = height - 120; spriteVY=0;
+    spriteY=height-120; spriteVY=0; ducking=false;
     speed=4;
     requestAnimationFrame(gameLoop);
 }
-
-function spawnObstacle(){
-    let h = Math.random()*40 + 40;
-    let y = height - h - 20;
-    obstacles.push(new Obstacle(width, y, 30, h));
-}
-function spawnItem(){
-    let size = 20;
-    let y = Math.random()*(height-150)+50;
-    items.push(new Item(width, y, size));
-}
-
-let frameCount=0;
 
 function gameLoop(){
     if(!gameRunning) return;
     ctx.clearRect(0,0,width,height);
 
-    // move sprite
-    if(keys.ArrowUp && spriteY>=0) spriteVY=jumpForce;
+    // Movimiento payasita
+    if(keys.ArrowUp && spriteY>=0){ spriteVY=jumpForce; ducking=false; }
+    ducking = keys.ArrowDown && spriteY>=height-64-20;
     spriteVY += gravity;
     spriteY += spriteVY;
-    if(spriteY > height-64-20) {spriteY = height-64-20; spriteVY=0;}
+    if(spriteY>height-64-20){ spriteY=height-64-20; spriteVY=0; }
 
-    // draw sprite frame
-    spriteFrame +=0.15;
+    // Dibujar sprite
+    spriteFrame+=0.15;
     if(spriteFrame>=spriteFrameCount) spriteFrame=0;
-    ctx.drawImage(sprite, Math.floor(spriteFrame)*spriteWidth,0,spriteWidth,spriteHeight, spriteX, spriteY,64,64);
+    let drawH = ducking?spriteHeight/2:spriteHeight;
+    ctx.drawImage(sprite, Math.floor(spriteFrame)*spriteWidth,0,spriteWidth,spriteHeight, spriteX, spriteY+ (ducking?spriteHeight/2:0),64,drawH);
 
-    // spawn obstacles & items
-    if(frameCount%120===0) spawnObstacle();
-    if(frameCount%180===0) spawnItem();
+    // Spawn
+    if(frameCount%100===0) spawnObstacle();
+    if(frameCount%150===0) spawnItem();
 
-    // move and draw obstacles
+    // Obstáculos
     for(let i=obstacles.length-1;i>=0;i--){
-        obstacles[i].x -= speed;
+        obstacles[i].y += speed;
         ctx.fillStyle='red';
         ctx.fillRect(obstacles[i].x, obstacles[i].y, obstacles[i].w, obstacles[i].h);
-
-        // collision
-        if(spriteX<obstacles[i].x+obstacles[i].w && spriteX+64>obstacles[i].x && spriteY<obstacles[i].y+obstacles[i].h && spriteY+64>obstacles[i].y){
-            gameRunning=false; alert('¡Perdiste! Puntaje: '+score);
-        }
-        if(obstacles[i].x+obstacles[i].w<0) obstacles.splice(i,1);
+        // Colisión
+        if(spriteX<obstacles[i].x+obstacles[i].w && spriteX+64>obstacles[i].x &&
+           spriteY<obstacles[i].y+obstacles[i].h && spriteY+drawH>obstacles[i].y){
+               gameRunning=false;
+               alert('¡Perdiste! Puntaje: '+score);
+           }
+        if(obstacles[i].y>height) obstacles.splice(i,1);
     }
 
-    // move and draw items
+    // Items
     for(let i=items.length-1;i>=0;i--){
-        items[i].x -= speed;
+        items[i].y += speed;
         ctx.fillStyle='gold';
         ctx.beginPath();
         ctx.arc(items[i].x+items[i].size/2, items[i].y+items[i].size/2, items[i].size/2,0,2*Math.PI);
         ctx.fill();
-
-        // collect
-        if(spriteX<items[i].x+items[i].size && spriteX+64>items[i].x && spriteY<items[i].y+items[i].size && spriteY+64>items[i].y){
-            score++;
-            spawnParticles(items[i].x+items[i].size/2, items[i].y+items[i].size/2);
-            items.splice(i,1);
-        }
-        if(items[i] && items[i].x+items[i].size<0) items.splice(i,1);
+        // recoger
+        if(spriteX<items[i].x+items[i].size && spriteX+64>items[i].x &&
+           spriteY<items[i].y+items[i].size && spriteY+drawH>items[i].y){
+               score++;
+               spawnParticles(items[i].x+items[i].size/2, items[i].y+items[i].size/2);
+               items.splice(i,1);
+           }
+        if(items[i] && items[i].y>height) items.splice(i,1);
     }
 
-    // draw particles
+    // Partículas
     for(let i=particles.length-1;i>=0;i--){
         let p = particles[i];
-        p.vy += 0.2;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -=0.03;
-        ctx.fillStyle = `rgba(212,175,55,${p.alpha})`;
+        p.vy +=0.2; p.x+=p.vx; p.y+=p.vy; p.alpha-=0.03;
+        ctx.fillStyle=`rgba(212,175,55,${p.alpha})`;
         ctx.beginPath();
         ctx.arc(p.x,p.y,p.size,0,2*Math.PI);
         ctx.fill();
         if(p.alpha<=0) particles.splice(i,1);
     }
 
-    // score
-    ctx.fillStyle='#fff'; ctx.font='20px sans-serif'; ctx.fillText('Puntaje: '+score, 12,30);
+    // Puntaje
+    ctx.fillStyle='#fff'; ctx.font='22px sans-serif'; ctx.fillText('Puntaje: '+score, 12,30);
 
     frameCount++;
     requestAnimationFrame(gameLoop);
 }
-
-function spawnParticles(x,y){
-    for(let i=0;i<15;i++){
-        particles.push({
-            x:x, y:y,
-            vx:(Math.random()-0.5)*6,
-            vy:(Math.random()-1.5)*-6,
-            size: Math.random()*6+2,
-            alpha:1
-        });
-    }
-}
 </script>
+
 </body>
 </html>
