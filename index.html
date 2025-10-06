@@ -3,15 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSTV Social Dance</title>
+<title>RSTV Social Dance 5.0</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family: 'Poppins', sans-serif; background: linear-gradient(180deg, #000, #111); color: #fff; display:flex; overflow-x:hidden; }
 
-  /* MENÚ LATERAL */
+  /* ===== MENÚ LATERAL ===== */
   .sidebar {
-    position: fixed;
-    top:0; left:0; width:230px; height:100%;
+    position: fixed; top:0; left:0; width:230px; height:100%;
     background: linear-gradient(180deg,#000,#1a1a1a 80%);
     box-shadow: 3px 0 10px rgba(255,215,0,0.3);
     display:flex; flex-direction:column; align-items:center;
@@ -58,28 +57,30 @@
   h1 { font-size:2.5em; background: linear-gradient(90deg,#ffd700,#fff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; }
   p { max-width:650px; color:#ccc; line-height:1.7; font-size:1.1em; }
 
-  /* CONTENEDORES ESPECIALES */
-  #menu-coreografias { margin-top:20px; width:100%; }
-  .video-instagram {
-    width:100%; max-width:500px; aspect-ratio:1/1.77;
-    margin:15px auto; border-radius:10px; overflow:hidden;
-  }
+  /* VIDEOS COREGRAFÍAS */
+  .video-group { display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-top:20px; }
+  .video-card { background:#111; border:1px solid #d4af37; border-radius:10px; overflow:hidden; width:300px; max-width:90%; }
+  .video-card iframe { width:100%; height:350px; border:none; }
 
-  #contenedor-juego {
-    margin-top:20px; width:100%; max-width:600px; height:500px;
-    background: linear-gradient(135deg,#000,#1a1a1a);
-    border:2px solid rgba(255,215,0,0.5); border-radius:10px;
-    box-shadow:0 0 15px rgba(255,215,0,0.2);
-    position:relative; overflow:hidden;
-  }
+  /* JUEGO */
+  #game-container { width:100%; max-width:360px; margin-top:20px; position:relative; }
+  #game { position: relative; width: 100%; height:500px; background: rgba(0,0,0,0.85); border: 2px solid #d4af37; overflow:hidden; }
+  .hit-zone { position:absolute; bottom:20px; width:100%; height:50px; display:flex; justify-content:space-around; }
+  .socket { width:22%; max-width:60px; height:50px; border:2px dashed #d4af37; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#d4af37; font-size:1.5rem; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; }
+  .socket.active { background:#ffd700; box-shadow:0 0 30px #ffd700,0 0 60px #ffd700; color:#000; transform:scale(1.2); }
+  .arrow { width:22%; max-width:60px; height:50px; text-align:center; line-height:50px; font-size:2rem; font-weight:bold; color:#d4af37; border:2px solid #b8860b; border-radius:8px; position:absolute; top:0; transition: top 0.02s linear, transform 0.2s ease; }
+  .arrow.hit { animation: hitFlash 0.3s forwards; }
+  @keyframes hitFlash { 0%{transform:scale(1);color:#d4af37;}50%{transform:scale(1.5);color:#fff;}100%{transform:scale(1);color:#d4af37;} }
+  .particles { position:absolute; width:10px; height:10px; background: radial-gradient(circle,#ffd700,#b8860b); border-radius:50%; pointer-events:none; opacity:0.8; animation: particleMove 0.8s forwards; }
+  @keyframes particleMove {0%{transform:translateY(0) scale(1);}100%{transform:translateY(-50px) translateX(30px) scale(0);opacity:0;}}
+  #score { margin-top:15px; font-size:1.2rem; color:#d4af37; }
+  #comboDisplay { position:absolute; top:25%; font-size:3rem; font-weight:bold; color:#ffd700; text-shadow:0 0 15px #ffd700; display:none; }
+  #controls { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+  #controls button { width:60px; height:60px; font-size:2rem; background:#000; border:2px solid #d4af37; border-radius:10px; color:#d4af37; font-weight:bold; transition: transform 0.1s ease, background 0.2s; }
+  #controls button:active { transform:scale(1.2); background:#ffd700; color:#000; }
+  #startBtn { margin-top:20px; padding:10px 20px; font-size:1.5rem; background:#000; border:2px solid #d4af37; color:#d4af37; border-radius:10px; cursor:pointer; }
 
-  /* RESPONSIVE */
-  @media (max-width:768px){
-    .sidebar { transform:translateX(-100%); }
-    .sidebar.active { transform:translateX(0); }
-    .menu-toggle { display:block; }
-    main { margin-left:0; width:100%; }
-  }
+  @media(max-width:768px){ .sidebar { transform:translateX(-100%); } .sidebar.active { transform:translateX(0); } .menu-toggle { display:block; } main { margin-left:0; width:100%; } }
 
 </style>
 </head>
@@ -104,17 +105,13 @@
 
   <section id="coreografias">
     <h1>Coreografías</h1>
-    <p>Selecciona tu video favorito:</p>
-    <div id="menu-coreografias">
-      <!-- Menú desplegable de videos de Instagram -->
-      <select id="selector-videos">
-        <option value="">Selecciona un video</option>
-        <option value="https://www.instagram.com/p/VIDEO1/embed/">Video 1</option>
-        <option value="https://www.instagram.com/p/VIDEO2/embed/">Video 2</option>
-        <option value="https://www.instagram.com/p/VIDEO3/embed/">Video 3</option>
-      </select>
-      <div class="video-instagram" id="video-frame"></div>
-    </div>
+    <p>Selecciona un baile para ver varias versiones:</p>
+    <select id="selector-baile">
+      <option value="">--Selecciona un baile--</option>
+      <option value="baile1">Baile 1</option>
+      <option value="baile2">Baile 2</option>
+    </select>
+    <div id="videos-coreografia" class="video-group"></div>
   </section>
 
   <section id="bailes">
@@ -125,7 +122,26 @@
   <section id="juego">
     <h1>Juego</h1>
     <p>Presiona las flechas al ritmo de la música 💥🎵</p>
-    <div id="contenedor-juego"></div>
+    <div id="game-container">
+      <button id="startBtn">¡Comenzar Juego!</button>
+      <div id="game">
+        <div class="hit-zone">
+          <div class="socket" data-key="ArrowUp">↑</div>
+          <div class="socket" data-key="ArrowDown">↓</div>
+          <div class="socket" data-key="ArrowLeft">←</div>
+          <div class="socket" data-key="ArrowRight">→</div>
+        </div>
+        <div id="comboDisplay">COMBO!</div>
+      </div>
+    </div>
+    <div id="score">Puntaje: 0 | Combo: 0 | Récord: 0</div>
+    <div id="controls">
+      <button data-key="ArrowUp">↑</button>
+      <button data-key="ArrowDown">↓</button>
+      <button data-key="ArrowLeft">←</button>
+      <button data-key="ArrowRight">→</button>
+    </div>
+    <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
   </section>
 
   <section id="nosotros">
@@ -135,77 +151,100 @@
 </main>
 
 <script>
-  // Desplazamiento suave
-  document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor=>{
-    anchor.addEventListener('click',function(e){
+  // Menú lateral y scroll suave
+  document.querySelectorAll('.sidebar a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
       e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({behavior:'smooth'});
-      if(window.innerWidth<=768){document.querySelector('.sidebar').classList.remove('active');}
+      document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+      if(window.innerWidth<=768) document.querySelector('.sidebar').classList.remove('active');
     });
   });
-  // Menú móvil
   document.querySelector('.menu-toggle').addEventListener('click',()=>{document.querySelector('.sidebar').classList.toggle('active');});
 
-  // Videos Instagram responsive
-  const selector = document.getElementById('selector-videos');
-  const frame = document.getElementById('video-frame');
-  selector.addEventListener('change',()=>{
-    const url = selector.value;
-    if(url){
-      frame.innerHTML = `<iframe src="${url}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
-    } else {
-      frame.innerHTML = '';
+  // ===== Menú coreografía =====
+  const selectorBaile = document.getElementById('selector-baile');
+  const contVideos = document.getElementById('videos-coreografia');
+  const videosPorBaile = {
+    'baile1': [
+      'https://www.instagram.com/p/VIDEO1/embed/',
+      'https://www.instagram.com/p/VIDEO2/embed/'
+    ],
+    'baile2': [
+      'https://www.instagram.com/p/VIDEO3/embed/',
+      'https://www.instagram.com/p/VIDEO4/embed/'
+    ]
+  };
+  selectorBaile.addEventListener('change',()=>{
+    const val = selectorBaile.value;
+    contVideos.innerHTML='';
+    if(videosPorBaile[val]){
+      videosPorBaile[val].forEach(url=>{
+        const card = document.createElement('div');
+        card.className='video-card';
+        card.innerHTML=`<iframe src="${url}" allowfullscreen></iframe>`;
+        contVideos.appendChild(card);
+      });
     }
   });
 
-  // ===== Juego de flechas psicodélico =====
-  const contJuego = document.getElementById('contenedor-juego');
-  const canvas = document.createElement('canvas');
-  canvas.width = contJuego.clientWidth;
-  canvas.height = contJuego.clientHeight;
-  contJuego.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-
+  // ===== Juego de flechas =====
+  const game = document.getElementById("game");
+  const scoreDisplay = document.getElementById("score");
+  const comboDisplay = document.getElementById("comboDisplay");
+  const sockets = document.querySelectorAll(".socket");
+  const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
+  const symbols = ["↑","↓","←","→"];
   let arrows = [];
-  const keys = ['ArrowLeft','ArrowUp','ArrowDown','ArrowRight'];
-  const arrowColors = ['#FFD700','#FFFFFF','#FF8C00','#DA70D6'];
+  let score = 0, combo = 0, speed = 3, record = localStorage.getItem("danceRecord")||0, gameStarted=false;
+  const music = document.getElementById("music");
+  const hitStart = game.clientHeight - 80;
+  const hitEnd = game.clientHeight - 30;
+  const BPM = 120;
+  const msPerBeat = 60000/BPM;
 
-  // Generar flechas
-  function spawnArrow(){
-    const index = Math.floor(Math.random()*4);
-    arrows.push({
-      x: index*canvas.width/4 + canvas.width/8,
-      y: -50,
-      key: keys[index],
-      color: arrowColors[index]
-    });
-  }
-
-  // Animación
-  function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    arrows.forEach(a=>{
-      a.y += 4; // velocidad
-      // psicodélico: líneas de color brillante
-      ctx.strokeStyle = a.color;
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(a.x, a.y+30);
-      ctx.stroke();
-    });
-    arrows = arrows.filter(a=>a.y<canvas.height);
-    requestAnimationFrame(animate);
-  }
-  animate();
-  setInterval(spawnArrow,700); // caen cada 0.7s
-
-  // Ajuste canvas responsive
-  window.addEventListener('resize',()=>{
-    canvas.width = contJuego.clientWidth;
-    canvas.height = contJuego.clientHeight;
+  document.getElementById("startBtn").addEventListener("click",()=>{
+    if(!gameStarted){ music.play(); gameStarted=true; arrowLoop(); document.getElementById("startBtn").style.display="none";}
   });
 
+  function createArrow(){
+    const index=Math.floor(Math.random()*4); const key=keys[index]; const symbol=symbols[index];
+    const arrow=document.createElement("div"); arrow.classList.add("arrow"); arrow.textContent=symbol; arrow.dataset.key=key;
+    const socketRect=sockets[index].getBoundingClientRect(); const gameRect=game.getBoundingClientRect();
+    arrow.style.left=socketRect.left-gameRect.left+"px"; arrow.style.top="-60px"; game.appendChild(arrow); arrows.push(arrow);
+  }
+
+  function moveArrows(){
+    arrows.forEach((arrow,i)=>{
+      let top=parseInt(arrow.style.top); arrow.style.top=top+speed+"px";
+      if(top>game.clientHeight){ arrow.remove(); arrows.splice(i,1); combo=0; updateComboDisplay(); score-=5; updateScore(); }
+    });
+  }
+
+  function createParticles(x,y){ for(let i=0;i<12;i++){ const p=document.createElement("div"); p.classList.add("particles"); p.style.left=x+"px"; p.style.top=y+"px"; game.appendChild(p); setTimeout(()=>p.remove(),800);} }
+
+  function checkArrow(keyPressed){
+    arrows.forEach((arrow,i)=>{
+      let top=parseInt(arrow.style.top);
+      if(keyPressed===arrow.dataset.key && top>=hitStart && top<=hitEnd){
+        arrow.classList.add("hit"); setTimeout(()=>arrow.remove(),300); arrows.splice(i,1);
+        score+=10+combo*2; combo+=1; updateScore(); updateComboDisplay();
+        const index=keys.indexOf(keyPressed); const socket=sockets[index];
+        createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
+        socket.classList.add("active"); setTimeout(()=>socket.classList.remove("active"),200);
+        speed+=0.05; if(intervalCreate>400) intervalCreate-=5;
+        if(score>record){ record=score; localStorage.setItem("danceRecord",record);}
+      }
+    });
+  }
+
+  function updateComboDisplay(){ if(combo>=3){ comboDisplay.style.display="block"; comboDisplay.textContent=`COMBO x${combo}!`; comboDisplay.style.opacity=1; setTimeout(()=>comboDisplay.style.opacity=0,400);} else{ comboDisplay.style.display="none";} }
+  function updateScore(){ scoreDisplay.textContent=`Puntaje: ${score} | Combo: ${combo} | Récord: ${record}`; }
+  document.addEventListener("keydown",(e)=>{ checkArrow(e.key); });
+  document.querySelectorAll("#controls button").forEach(btn=>btn.addEventListener("click",()=>{ checkArrow(btn.dataset.key); }));
+
+  setInterval(moveArrows,20);
+  function arrowLoop(){ if(gameStarted){ createArrow(); setTimeout(arrowLoop,msPerBeat); } }
 </script>
+
 </body>
 </html>
