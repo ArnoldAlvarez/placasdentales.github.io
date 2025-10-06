@@ -3,213 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tetris RSTV</title>
+<title>Juego de Baile PRO RSTV</title>
 <style>
-  body {
-    margin: 0;
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg,#000,#111);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  h1 {
-    background: linear-gradient(90deg,#d4af37,#b8860b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: center;
-    margin-top: 20px;
-  }
-
-  #tetris {
-    position: relative;
-    width: 200px;
-    height: 400px;
-    background: rgba(0,0,0,0.85);
-    border: 2px solid #d4af37;
-    margin-top: 20px;
-    display: grid;
-    grid-template-rows: repeat(20, 20px);
-    grid-template-columns: repeat(10, 20px);
-  }
-
-  .cell {
-    border: 1px solid #333;
-    box-sizing: border-box;
-  }
-
-  .filled {
-    background: linear-gradient(90deg,#d4af37,#b8860b);
-  }
-
-  #score {
-    margin-top: 20px;
-    font-size: 1.2rem;
-    color: #d4af37;
-  }
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg,#000,#111);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+h1 {
+  margin-top: 20px;
+  text-align: center;
+  background: linear-gradient(90deg,#d4af37,#b8860b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#game {
+  position: relative;
+  width: 300px;
+  height: 500px;
+  background: rgba(0,0,0,0.85);
+  border: 2px solid #d4af37;
+  margin-top: 20px;
+  overflow: hidden;
+}
+.hit-zone {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  height: 50px;
+  border-top: 2px solid #d4af37;
+  display: flex;
+  justify-content: space-around;
+}
+.arrow {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #d4af37;
+  border: 2px solid #b8860b;
+  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  transition: top 0.02s linear, transform 0.2s ease;
+}
+.arrow.hit {
+  animation: hitFlash 0.3s forwards;
+}
+@keyframes hitFlash {
+  0% { transform: scale(1); color: #d4af37;}
+  50% { transform: scale(1.3); color: #fff;}
+  100% { transform: scale(1); color: #d4af37;}
+}
+#score {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #d4af37;
+}
 </style>
 </head>
 <body>
 
-<h1>Tetris RSTV</h1>
-<div id="tetris"></div>
-<div id="score">Puntaje: 0</div>
+<h1>RSTV Social Dance PRO</h1>
+<div id="game">
+  <div class="hit-zone">
+    <div>↑</div>
+    <div>↓</div>
+    <div>←</div>
+    <div>→</div>
+  </div>
+</div>
+<div id="score">Puntaje: 0 | Combo: 0</div>
+
+<!-- Música opcional -->
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
 
 <script>
-const tetris = document.getElementById("tetris");
+const game = document.getElementById("game");
 const scoreDisplay = document.getElementById("score");
-const rows = 20;
-const cols = 10;
+const music = document.getElementById("music");
+
+const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
+const symbols = ["↑","↓","←","→"];
+let arrows = [];
 let score = 0;
+let combo = 0;
+let speed = 3;
+let intervalCreate = 1000;
 
-// Crear grilla
-let grid = [];
-for(let r=0;r<rows;r++){
-  let row = [];
-  for(let c=0;c<cols;c++){
-    let cell = document.createElement("div");
-    cell.classList.add("cell");
-    tetris.appendChild(cell);
-    row.push(cell);
-  }
-  grid.push(row);
+const hitStart = 420;
+const hitEnd = 470;
+
+// Crear flecha
+function createArrow(){
+  const index = Math.floor(Math.random()*4);
+  const key = keys[index];
+  const symbol = symbols[index];
+  const arrow = document.createElement("div");
+  arrow.classList.add("arrow");
+  arrow.textContent = symbol;
+  arrow.dataset.key = key;
+  arrow.style.left = 60*index + "px";
+  arrow.style.top = "-60px";
+  game.appendChild(arrow);
+  arrows.push(arrow);
 }
 
-// Piezas Tetris
-const pieces = [
-  [[1,1,1,1]], // I
-  [[1,1],[1,1]], // O
-  [[0,1,0],[1,1,1]], // T
-  [[1,1,0],[0,1,1]], // S
-  [[0,1,1],[1,1,0]], // Z
-  [[1,0,0],[1,1,1]], // J
-  [[0,0,1],[1,1,1]]  // L
-];
+// Mover flechas
+function moveArrows(){
+  arrows.forEach((arrow,i)=>{
+    let top = parseInt(arrow.style.top);
+    arrow.style.top = top + speed + "px";
 
-let currentPiece = {
-  shape: pieces[Math.floor(Math.random()*pieces.length)],
-  x: 3,
-  y: 0
-};
-
-// Dibujar pieza
-function draw(){
-  for(let r=0;r<currentPiece.shape.length;r++){
-    for(let c=0;c<currentPiece.shape[r].length;c++){
-      if(currentPiece.shape[r][c]){
-        let row = currentPiece.y + r;
-        let col = currentPiece.x + c;
-        if(row>=0 && row<rows && col>=0 && col<cols)
-          grid[row][col].classList.add("filled");
-      }
+    if(top > game.clientHeight){
+      game.removeChild(arrow);
+      arrows.splice(i,1);
+      combo = 0;
+      score -= 5;
+      updateScore();
     }
-  }
+  });
 }
 
-// Borrar pieza
-function undraw(){
-  for(let r=0;r<currentPiece.shape.length;r++){
-    for(let c=0;c<currentPiece.shape[r].length;c++){
-      if(currentPiece.shape[r][c]){
-        let row = currentPiece.y + r;
-        let col = currentPiece.x + c;
-        if(row>=0 && row<rows && col>=0 && col<cols)
-          grid[row][col].classList.remove("filled");
-      }
-    }
-  }
-}
-
-// Mover pieza
-function moveDown(){
-  undraw();
-  currentPiece.y++;
-  if(collide()){
-    currentPiece.y--;
-    lock();
-    currentPiece = {
-      shape: pieces[Math.floor(Math.random()*pieces.length)],
-      x: 3,
-      y:0
-    };
-  }
-  draw();
-}
-
-// Colisión
-function collide(){
-  for(let r=0;r<currentPiece.shape.length;r++){
-    for(let c=0;c<currentPiece.shape[r].length;c++){
-      if(currentPiece.shape[r][c]){
-        let row = currentPiece.y + r;
-        let col = currentPiece.x + c;
-        if(row>=rows || col<0 || col>=cols || grid[row][col].classList.contains("locked")){
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-// Bloquear pieza
-function lock(){
-  for(let r=0;r<currentPiece.shape.length;r++){
-    for(let c=0;c<currentPiece.shape[r].length;c++){
-      if(currentPiece.shape[r][c]){
-        let row = currentPiece.y + r;
-        let col = currentPiece.x + c;
-        grid[row][col].classList.add("locked");
-      }
-    }
-  }
-  clearLines();
-}
-
-// Limpiar líneas completas
-function clearLines(){
-  for(let r=rows-1;r>=0;r--){
-    let full = true;
-    for(let c=0;c<cols;c++){
-      if(!grid[r][c].classList.contains("locked")) full=false;
-    }
-    if(full){
-      for(let c=0;c<cols;c++){
-        grid[r][c].classList.remove("locked","filled");
-      }
-      // bajar líneas
-      for(let row=r-1; row>=0; row--){
-        for(let c=0;c<cols;c++){
-          if(grid[row][c].classList.contains("locked")){
-            grid[row][c].classList.remove("locked");
-            grid[row+1][c].classList.add("locked");
-          }
-        }
-      }
-      score += 10;
-      scoreDisplay.textContent = "Puntaje: "+score;
-      r++; // volver a chequear la misma línea
-    }
-  }
-}
-
-// Controles
+// Detectar aciertos
 document.addEventListener("keydown",(e)=>{
-  undraw();
-  if(e.key==="ArrowLeft"){currentPiece.x--; if(collide()) currentPiece.x++}
-  if(e.key==="ArrowRight"){currentPiece.x++; if(collide()) currentPiece.x--}
-  if(e.key==="ArrowDown"){currentPiece.y++; if(collide()){currentPiece.y--; lock(); currentPiece = {shape: pieces[Math.floor(Math.random()*pieces.length)], x:3,y:0}}}
-  draw();
+  arrows.forEach((arrow,i)=>{
+    let top = parseInt(arrow.style.top);
+    if(e.key === arrow.dataset.key && top >= hitStart && top <= hitEnd){
+      // Animación hit
+      arrow.classList.add("hit");
+      setTimeout(()=>arrow.remove(),300);
+      arrows.splice(i,1);
+      score += 10 + combo*2;
+      combo += 1;
+      updateScore();
+      speed += 0.05; // aumenta velocidad progresiva
+      if(intervalCreate>400) intervalCreate -=5; // aumenta frecuencia
+    }
+  });
 });
 
-// Loop del juego
-draw();
-setInterval(moveDown,500);
+function updateScore(){
+  scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo}`;
+}
+
+// Loop de movimiento
+setInterval(moveArrows,20);
+
+// Loop de creación de flechas con velocidad progresiva
+function arrowLoop(){
+  createArrow();
+  setTimeout(arrowLoop, intervalCreate);
+}
+arrowLoop();
 </script>
+
 </body>
 </html>
