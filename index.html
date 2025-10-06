@@ -1,768 +1,211 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSTV Social Dance</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(180deg, #000 0%, #111 100%);
-      color: #fff;
-      overflow-x: hidden;
-      display: flex;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSTV Social Dance</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Poppins', sans-serif; background: linear-gradient(180deg, #000, #111); color: #fff; display:flex; overflow-x:hidden; }
 
-    /* ======= MENÚ LATERAL ======= */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 230px;
-      height: 100%;
-      background: linear-gradient(180deg, #000, #1a1a1a 80%);
-      box-shadow: 3px 0 10px rgba(255, 215, 0, 0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 40px;
-      border-right: 2px solid rgba(255, 215, 0, 0.5);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-    }
+  /* MENÚ LATERAL */
+  .sidebar {
+    position: fixed;
+    top:0; left:0; width:230px; height:100%;
+    background: linear-gradient(180deg,#000,#1a1a1a 80%);
+    box-shadow: 3px 0 10px rgba(255,215,0,0.3);
+    display:flex; flex-direction:column; align-items:center;
+    padding-top:40px; border-right:2px solid rgba(255,215,0,0.5);
+    transition: transform 0.3s ease; z-index:1000;
+  }
+  .sidebar h2 {
+    background: linear-gradient(90deg,#ffd700,#fff);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    font-size:1.8em; margin-bottom:35px; letter-spacing:1px;
+  }
+  .sidebar a {
+    text-decoration:none; color:#fff;
+    background: linear-gradient(90deg,#111,#222);
+    padding:12px 20px; margin:8px 0;
+    border-radius:10px; width:80%; text-align:center;
+    transition:0.3s; font-weight:600;
+    border:1px solid rgba(255,215,0,0.3);
+  }
+  .sidebar a:hover {
+    background: linear-gradient(90deg,#ffd700,#fff);
+    color:#000; transform:scale(1.08);
+    box-shadow:0 0 10px rgba(255,215,0,0.8);
+  }
 
-    .sidebar h2 {
-      background: linear-gradient(90deg, #ffd700, #fff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 1.8em;
-      margin-bottom: 35px;
-      letter-spacing: 1px;
-    }
+  /* BOTÓN HAMBURGUESA */
+  .menu-toggle {
+    display:none; position:fixed; top:20px; left:20px;
+    background: linear-gradient(90deg,#ffd700,#fff);
+    border:none; color:#000; padding:10px 15px;
+    font-size:22px; border-radius:8px; z-index:1100; cursor:pointer;
+    box-shadow:0 0 10px rgba(255,215,0,0.7); transition:0.2s;
+  }
+  .menu-toggle:hover { transform:scale(1.1); }
 
-    .sidebar a {
-      text-decoration: none;
-      color: #fff;
-      background: linear-gradient(90deg, #111, #222);
-      padding: 12px 20px;
-      margin: 8px 0;
-      border-radius: 10px;
-      width: 80%;
-      text-align: center;
-      transition: 0.3s;
-      font-weight: 600;
-      border: 1px solid rgba(255, 215, 0, 0.3);
-    }
+  /* CONTENIDO PRINCIPAL */
+  main { margin-left:230px; width: calc(100% - 230px); transition:margin-left 0.3s ease; }
+  section {
+    min-height:100vh; padding:80px 25px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    background: radial-gradient(circle at center,#111 0%,#000 100%);
+    border-bottom:1px solid rgba(255,215,0,0.1);
+  }
+  h1 { font-size:2.5em; background: linear-gradient(90deg,#ffd700,#fff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:15px; }
+  p { max-width:650px; color:#ccc; line-height:1.7; font-size:1.1em; }
 
-    .sidebar a:hover {
-      background: linear-gradient(90deg, #ffd700, #fff);
-      color: #000;
-      transform: scale(1.08);
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-    }
+  /* CONTENEDORES ESPECIALES */
+  #menu-coreografias { margin-top:20px; width:100%; }
+  .video-instagram {
+    width:100%; max-width:500px; aspect-ratio:1/1.77;
+    margin:15px auto; border-radius:10px; overflow:hidden;
+  }
 
-    /* ======= CONTENIDO ======= */
-    main {
-      margin-left: 230px;
-      width: calc(100% - 230px);
-      transition: margin-left 0.3s ease;
-    }
+  #contenedor-juego {
+    margin-top:20px; width:100%; max-width:600px; height:500px;
+    background: linear-gradient(135deg,#000,#1a1a1a);
+    border:2px solid rgba(255,215,0,0.5); border-radius:10px;
+    box-shadow:0 0 15px rgba(255,215,0,0.2);
+    position:relative; overflow:hidden;
+  }
 
-    section {
-      min-height: 100vh;
-      padding: 80px 25px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      background: radial-gradient(circle at center, #111 0%, #000 100%);
-      border-bottom: 1px solid rgba(255, 215, 0, 0.1);
-    }
+  /* RESPONSIVE */
+  @media (max-width:768px){
+    .sidebar { transform:translateX(-100%); }
+    .sidebar.active { transform:translateX(0); }
+    .menu-toggle { display:block; }
+    main { margin-left:0; width:100%; }
+  }
 
-    h1 {
-      font-size: 2.5em;
-      background: linear-gradient(90deg, #ffd700, #fff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 15px;
-    }
-
-    p {
-      max-width: 650px;
-      color: #ccc;
-      line-height: 1.7;
-      font-size: 1.1em;
-    }
-
-    /* ======= BOTÓN HAMBURGUESA ======= */
-    .menu-toggle {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: linear-gradient(90deg, #ffd700, #fff);
-      border: none;
-      color: #000;
-      padding: 10px 15px;
-      font-size: 22px;
-      border-radius: 8px;
-      z-index: 1100;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-      transition: transform 0.2s ease;
-    }
-
-    .menu-toggle:hover {
-      transform: scale(1.1);
-    }
-
-    /* ======= CONTENEDORES ESPECIALES ======= */
-    #contenedor-juego {
-      margin-top: 20px;
-      width: 100%;
-      height: 500px;
-      background: linear-gradient(135deg, #000, #1a1a1a);
-      border: 2px solid rgba(255, 215, 0, 0.5);
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-    }
-
-    /* ======= RESPONSIVE ======= */
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
-      .sidebar.active {
-        transform: translateX(0);
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      main {
-        margin-left: 0;
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Botón menú móvil -->
-  <button class="menu-toggle">☰</button>
-
-  <!-- Menú lateral -->
-  <div class="sidebar">
-    <h2>RSTV</h2>
-    <a href="#inicio">Inicio</a>
-    <a href="#coreografias">Coreografías</a>
-    <a href="#bailes">Bailes</a>
-    <a href="#juego">Juego</a>
-    <a href="#nosotros">Nosotros</a>
-  </div>
-
-  <!-- Contenido -->
-  <main>
-    <section id="inicio">
-      <h1>Bienvenido a RSTV Social Dance</h1>
-      <p>Donde el ritmo, el arte y la comunidad brillan como el oro 🖤✨</p>
-    </section>
-
-    <section id="coreografias">
-      <h1>Coreografías</h1>
-      <p>Aquí puedes pegar el menú desplegable de coreografías.</p>
-      <!-- 🔽 Pega tu menú desplegable aquí -->
-      <div id="menu-coreografias">
-              <style>
-    /* ---------- ESTILOS BASE ---------- */
-    body {
-      font-family: "Poppins", sans-serif;
-      margin: 0;
-      background: linear-gradient(135deg, #000, #1a1a1a, #0d0d0d);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .menu-container {
-      width: 100%;
-      max-width: 900px;
-      background: rgba(0, 0, 0, 0.85);
-      border-radius: 14px;
-      box-shadow: 0 0 25px rgba(255, 215, 100, 0.15);
-      border: 1px solid rgba(255, 215, 100, 0.25);
-      overflow: hidden;
-    }
-
-    /* ---------- LOGO Y TÍTULO ---------- */
-    .logo-section {
-      text-align: center;
-      padding: 25px 15px 10px;
-      background: linear-gradient(180deg, #0a0a0a, #111);
-      border-bottom: 1px solid rgba(255, 215, 100, 0.15);
-    }
-
-    .logo-text {
-      font-size: 1.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      background: linear-gradient(90deg, #d4af37, #b8860b, #c5a74e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      position: relative;
-      display: inline-block;
-      letter-spacing: 1.5px;
-      animation: shine 6s linear infinite;
-    }
-
-    @keyframes shine {
-      0% { background-position: -200px 0; }
-      100% { background-position: 200px 0; }
-    }
-
-    .logo-sub {
-      font-size: 1rem;
-      color: #c5a74e;
-      letter-spacing: 1px;
-      margin-top: 5px;
-      opacity: 0.9;
-    }
-
-    h2 {
-      text-align: center;
-      padding: 15px;
-      margin: 0;
-      background: linear-gradient(90deg, #d4af37, #b8860b, #d4af37);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 1.4rem;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    /* ---------- MENÚ ---------- */
-    .menu-item {
-      border-top: 1px solid rgba(255, 215, 100, 0.15);
-    }
-
-    .menu-header {
-      position: sticky;
-      top: 0;
-      background: linear-gradient(90deg, #000, #141414, #000);
-      padding: 15px 20px;
-      cursor: pointer;
-      color: #d4af37;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      z-index: 2;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .menu-header:hover {
-      background: linear-gradient(90deg, #d4af37, #b8860b, #000);
-      color: #000;
-    }
-
-    .arrow {
-      transition: transform 0.3s ease;
-    }
-
-    /* ---------- CONTENIDO DESPLEGABLE ---------- */
-    .menu-content {
-      display: none;
-      background: rgba(0, 0, 0, 0.95);
-      overflow-y: auto;
-      max-height: 80vh;
-      padding: 10px;
-    }
-
-    .menu-content iframe {
-      width: 100%;
-      min-height: 600px;
-      border: none;
-      border-radius: 10px;
-      background: #000;
-    }
-
-    /* ---------- CUANDO SE ABRE ---------- */
-    .active .menu-content {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .active .arrow {
-      transform: rotate(180deg);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ---------- SCROLL DORADO ---------- */
-    .menu-content::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .menu-content::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #b8860b, #d4af37);
-      border-radius: 4px;
-    }
-
-    .menu-content::-webkit-scrollbar-track {
-      background: #111;
-    }
-
-    /* ---------- RESPONSIVE ---------- */
-    @media (max-width: 600px) {
-      .menu-container {
-        width: 95%;
-        border-radius: 10px;
-      }
-
-      .logo-text {
-        font-size: 1.4rem;
-      }
-
-      h2 {
-        font-size: 1.1rem;
-      }
-
-      .menu-header {
-        font-size: 0.9rem;
-      }
-
-      .menu-content iframe {
-        min-height: 480px;
-      }
-    }
-
-    @media (orientation: landscape) and (max-height: 500px) {
-      .menu-content iframe {
-        min-height: 400px;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="menu-container">
-    <!-- Logo -->
-    <div class="logo-section">
-      <div class="logo-text">RSTV Social Dance</div>
-      <div class="logo-sub">Movimiento, Ritmo y Estilo</div>
-    </div>
-
-    <h2>🎬 Mis Videos de Instagram</h2>
-
-    <!-- VIDEO 1 -->
-    <div class="menu-item">
-      <div class="menu-header">
-        <span>Tropiflow en acción</span>
-        <span class="arrow">▼</span>
-      </div>
-      <div class="menu-content">
-        <iframe src="https://www.instagram.com/p/XXXXXXXX/embed" allowfullscreen></iframe>
-      </div>
-    </div>
-
-    <!-- VIDEO 2 -->
-    <div class="menu-item">
-      <div class="menu-header">
-        <span>Baile Social Dance</span>
-        <span class="arrow">▼</span>
-      </div>
-      <div class="menu-content">
-        <iframe src="https://www.instagram.com/p/YYYYYYYY/embed" allowfullscreen></iframe>
-      </div>
-    </div>
-
-    <!-- VIDEO 3 -->
-    <div class="menu-item">
-      <div class="menu-header">
-        <span>Barrio Flow Dorado</span>
-        <span class="arrow">▼</span>
-      </div>
-      <div class="menu-content">
-        <iframe src="https://www.instagram.com/p/ZZZZZZZZ/embed" allowfullscreen></iframe>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    // Control del despliegue del menú
-    const headers = document.querySelectorAll('.menu-header');
-
-    headers.forEach(header => {
-      header.addEventListener('click', () => {
-        const item = header.parentElement;
-        const isActive = item.classList.contains('active');
-
-        // Cierra todos los demás
-        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-
-        // Abre el actual si no estaba activo
-        if (!isActive) item.classList.add('active');
-      });
-    });
-  </script>
-      </div>
-    </section>
-
-    <section id="bailes">
-      <h1>Bailes</h1>
-      <p>Explora nuestros estilos más populares — cumbia, salsa, bachata y más — con un toque RSTV.</p>
-    </section>
-
-    <section id="juego">
-      <h1>Juego</h1>
-      <p>Pega aquí tu juego de baile interactivo.</p>
-      <!-- 🔽 Pega tu juego aquí -->
-      <div id="contenedor-juego">
-         <style>
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg,#000,#111);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-}
-h1 {
-  margin-top: 20px;
-  text-align: center;
-  background: linear-gradient(90deg,#d4af37,#b8860b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-#game {
-  position: relative;
-  width: 90%;
-  max-width: 360px;
-  height: 500px;
-  background: rgba(0,0,0,0.85);
-  border: 2px solid #d4af37;
-  margin-top: 20px;
-  overflow: hidden;
-}
-.hit-zone {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: space-around;
-}
-.socket {
-  width: 22%;
-  max-width: 60px;
-  height: 50px;
-  border: 2px dashed #d4af37;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d4af37;
-  font-size: 1.5rem;
-  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
-}
-.socket.active {
-  background: #ffd700;
-  box-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700;
-  color: #000;
-  transform: scale(1.2);
-}
-.arrow {
-  width: 22%;
-  max-width: 60px;
-  height: 50px;
-  text-align: center;
-  line-height: 50px;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #d4af37;
-  border: 2px solid #b8860b;
-  border-radius: 8px;
-  position: absolute;
-  top: 0;
-  transition: top 0.02s linear, transform 0.2s ease;
-}
-.arrow.hit {
-  animation: hitFlash 0.3s forwards;
-}
-@keyframes hitFlash {
-  0% { transform: scale(1); color: #d4af37;}
-  50% { transform: scale(1.5); color: #fff;}
-  100% { transform: scale(1); color: #d4af37;}
-}
-.particles {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: radial-gradient(circle,#ffd700,#b8860b);
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0.8;
-  animation: particleMove 0.8s forwards;
-}
-@keyframes particleMove {
-  0% { transform: translateY(0) scale(1);}
-  100% { transform: translateY(-50px) translateX(30px) scale(0); opacity: 0;}
-}
-#score {
-  margin-top: 15px;
-  font-size: 1.2rem;
-  color: #d4af37;
-}
-#comboDisplay {
-  position: absolute;
-  top: 25%;
-  font-size: 3rem;
-  font-weight: bold;
-  color: #ffd700;
-  text-shadow: 0 0 15px #ffd700;
-  display: none;
-}
-#controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-#controls button {
-  width: 60px;
-  height: 60px;
-  font-size: 2rem;
-  background: #000;
-  border: 2px solid #d4af37;
-  border-radius: 10px;
-  color: #d4af37;
-  font-weight: bold;
-  transition: transform 0.1s ease, background 0.2s;
-}
-#controls button:active {
-  transform: scale(1.2);
-  background: #ffd700;
-  color: #000;
-}
-#startBtn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1.5rem;
-  background: #000;
-  border: 2px solid #d4af37;
-  color: #d4af37;
-  border-radius: 10px;
-}
-#startBtn:hover {cursor: pointer;}
 </style>
 </head>
 <body>
 
-<h1>RSTV Social Dance 5.0 Showtime</h1>
+<button class="menu-toggle">☰</button>
 
-<button id="startBtn">¡Comenzar Juego!</button>
-
-<div id="game">
-  <div class="hit-zone">
-    <div class="socket" data-key="ArrowUp">↑</div>
-    <div class="socket" data-key="ArrowDown">↓</div>
-    <div class="socket" data-key="ArrowLeft">←</div>
-    <div class="socket" data-key="ArrowRight">→</div>
-  </div>
-  <div id="comboDisplay">COMBO!</div>
-</div>
-<div id="score">Puntaje: 0 | Combo: 0 | Récord: 0</div>
-
-<div id="controls">
-  <button data-key="ArrowUp">↑</button>
-  <button data-key="ArrowDown">↓</button>
-  <button data-key="ArrowLeft">←</button>
-  <button data-key="ArrowRight">→</button>
+<div class="sidebar">
+  <h2>RSTV</h2>
+  <a href="#inicio">Inicio</a>
+  <a href="#coreografias">Coreografías</a>
+  <a href="#bailes">Bailes</a>
+  <a href="#juego">Juego</a>
+  <a href="#nosotros">Nosotros</a>
 </div>
 
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+<main>
+  <section id="inicio">
+    <h1>Bienvenido a RSTV Social Dance</h1>
+    <p>Donde el ritmo, el arte y la comunidad brillan como el oro 🖤✨</p>
+  </section>
+
+  <section id="coreografias">
+    <h1>Coreografías</h1>
+    <p>Selecciona tu video favorito:</p>
+    <div id="menu-coreografias">
+      <!-- Menú desplegable de videos de Instagram -->
+      <select id="selector-videos">
+        <option value="">Selecciona un video</option>
+        <option value="https://www.instagram.com/p/VIDEO1/embed/">Video 1</option>
+        <option value="https://www.instagram.com/p/VIDEO2/embed/">Video 2</option>
+        <option value="https://www.instagram.com/p/VIDEO3/embed/">Video 3</option>
+      </select>
+      <div class="video-instagram" id="video-frame"></div>
+    </div>
+  </section>
+
+  <section id="bailes">
+    <h1>Bailes</h1>
+    <p>Explora nuestros estilos más populares: cumbia, salsa, bachata y más.</p>
+  </section>
+
+  <section id="juego">
+    <h1>Juego</h1>
+    <p>Presiona las flechas al ritmo de la música 💥🎵</p>
+    <div id="contenedor-juego"></div>
+  </section>
+
+  <section id="nosotros">
+    <h1>Nosotros</h1>
+    <p>Somos RSTV Social Dance: pasión, ritmo y comunidad en cada paso.</p>
+  </section>
+</main>
 
 <script>
-const game = document.getElementById("game");
-const scoreDisplay = document.getElementById("score");
-const comboDisplay = document.getElementById("comboDisplay");
-const sockets = document.querySelectorAll(".socket");
-const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
-const symbols = ["↑","↓","←","→"];
-let arrows = [];
-let score = 0;
-let combo = 0;
-let speed = 3;
-let intervalCreate = 1000;
-let record = localStorage.getItem("danceRecord") || 0;
-let gameStarted = false;
-const music = document.getElementById("music");
+  // Desplazamiento suave
+  document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor=>{
+    anchor.addEventListener('click',function(e){
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+      if(window.innerWidth<=768){document.querySelector('.sidebar').classList.remove('active');}
+    });
+  });
+  // Menú móvil
+  document.querySelector('.menu-toggle').addEventListener('click',()=>{document.querySelector('.sidebar').classList.toggle('active');});
 
-const hitStart = game.clientHeight - 80;
-const hitEnd = game.clientHeight - 30;
-
-// Parámetros BPM (beats por minuto)
-const BPM = 120; // Ajusta según la canción
-const msPerBeat = 60000 / BPM;
-
-document.getElementById("startBtn").addEventListener("click", () => {
-  if(!gameStarted){
-    music.play();
-    gameStarted = true;
-    arrowLoop();
-    document.getElementById("startBtn").style.display="none";
-  }
-});
-
-function createArrow(){
-  const index = Math.floor(Math.random()*4);
-  const key = keys[index];
-  const symbol = symbols[index];
-  const arrow = document.createElement("div");
-  arrow.classList.add("arrow");
-  arrow.textContent = symbol;
-  arrow.dataset.key = key;
-  const socketRect = sockets[index].getBoundingClientRect();
-  const gameRect = game.getBoundingClientRect();
-  arrow.style.left = socketRect.left - gameRect.left + "px";
-  arrow.style.top = "-60px";
-  game.appendChild(arrow);
-  arrows.push(arrow);
-}
-
-function moveArrows(){
-  arrows.forEach((arrow,i)=>{
-    let top = parseInt(arrow.style.top);
-    arrow.style.top = top + speed + "px";
-    if(top > game.clientHeight){
-      game.removeChild(arrow);
-      arrows.splice(i,1);
-      combo = 0;
-      updateComboDisplay();
-      score -= 5;
-      updateScore();
+  // Videos Instagram responsive
+  const selector = document.getElementById('selector-videos');
+  const frame = document.getElementById('video-frame');
+  selector.addEventListener('change',()=>{
+    const url = selector.value;
+    if(url){
+      frame.innerHTML = `<iframe src="${url}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
+    } else {
+      frame.innerHTML = '';
     }
   });
-}
 
-function createParticles(x, y){
-  for(let i=0;i<12;i++){
-    const p = document.createElement("div");
-    p.classList.add("particles");
-    p.style.left = x + "px";
-    p.style.top = y + "px";
-    game.appendChild(p);
-    setTimeout(()=>p.remove(),800);
+  // ===== Juego de flechas psicodélico =====
+  const contJuego = document.getElementById('contenedor-juego');
+  const canvas = document.createElement('canvas');
+  canvas.width = contJuego.clientWidth;
+  canvas.height = contJuego.clientHeight;
+  contJuego.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  let arrows = [];
+  const keys = ['ArrowLeft','ArrowUp','ArrowDown','ArrowRight'];
+  const arrowColors = ['#FFD700','#FFFFFF','#FF8C00','#DA70D6'];
+
+  // Generar flechas
+  function spawnArrow(){
+    const index = Math.floor(Math.random()*4);
+    arrows.push({
+      x: index*canvas.width/4 + canvas.width/8,
+      y: -50,
+      key: keys[index],
+      color: arrowColors[index]
+    });
   }
-}
 
-function checkArrow(keyPressed){
-  arrows.forEach((arrow,i)=>{
-    let top = parseInt(arrow.style.top);
-    if(keyPressed === arrow.dataset.key && top >= hitStart && top <= hitEnd){
-      arrow.classList.add("hit");
-      setTimeout(()=>arrow.remove(),300);
-      arrows.splice(i,1);
-      score += 10 + combo*2;
-      combo +=1;
-      updateScore();
-      updateComboDisplay();
-      const index = keys.indexOf(keyPressed);
-      const socket = sockets[index];
-      createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
-      socket.classList.add("active");
-      setTimeout(()=>socket.classList.remove("active"),200);
-      speed += 0.05;
-      if(intervalCreate>400) intervalCreate -=5;
-      if(score>record){
-        record = score;
-        localStorage.setItem("danceRecord", record);
-      }
-    }
+  // Animación
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    arrows.forEach(a=>{
+      a.y += 4; // velocidad
+      // psicodélico: líneas de color brillante
+      ctx.strokeStyle = a.color;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(a.x, a.y+30);
+      ctx.stroke();
+    });
+    arrows = arrows.filter(a=>a.y<canvas.height);
+    requestAnimationFrame(animate);
+  }
+  animate();
+  setInterval(spawnArrow,700); // caen cada 0.7s
+
+  // Ajuste canvas responsive
+  window.addEventListener('resize',()=>{
+    canvas.width = contJuego.clientWidth;
+    canvas.height = contJuego.clientHeight;
   });
-}
 
-function updateComboDisplay(){
-  if(combo>=3){
-    comboDisplay.style.display="block";
-    comboDisplay.textContent = COMBO x${combo}!;
-    comboDisplay.style.opacity=1;
-    setTimeout(()=>comboDisplay.style.opacity=0,400);
-  }else{
-    comboDisplay.style.display="none";
-  }
-}
-
-document.addEventListener("keydown",(e)=>{
-  checkArrow(e.key);
-});
-
-const controlButtons = document.querySelectorAll("#controls button");
-controlButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    checkArrow(btn.dataset.key);
-  });
-});
-
-function updateScore(){
-  scoreDisplay.textContent = Puntaje: ${score} | Combo: ${combo} | Récord: ${record};
-}
-
-// Loop de movimiento
-setInterval(moveArrows,20);
-
-// Loop de creación sincronizada al BPM
-function arrowLoop(){
-  if(gameStarted){
-    createArrow();
-    setTimeout(arrowLoop, msPerBeat);
-  }
-}
 </script>
-
-      </div>
-    </section>
-
-    <section id="nosotros">
-      <h1>Nosotros</h1>
-      <p>Somos RSTV Social Dance: una familia donde el movimiento se convierte en arte.</p>
-    </section>
-  </main>
-
-  <script>
-    // Desplazamiento suave
-    document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
-        if (window.innerWidth <= 768) {
-          document.querySelector('.sidebar').classList.remove('active');
-        }
-      });
-    });
-
-    // Menú móvil
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('.sidebar').classList.toggle('active');
-    });
-  </script>
-
 </body>
 </html>
