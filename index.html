@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSTV Social Dance 4.0 Épico</title>
+<title>RSTV Social Dance 5.0 Showtime</title>
 <style>
 body {
   margin: 0;
@@ -55,7 +55,7 @@ h1 {
 }
 .socket.active {
   background: #ffd700;
-  box-shadow: 0 0 25px #ffd700, 0 0 50px #ffd700;
+  box-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700;
   color: #000;
   transform: scale(1.2);
 }
@@ -103,11 +103,11 @@ h1 {
 }
 #comboDisplay {
   position: absolute;
-  top: 30%;
+  top: 25%;
   font-size: 3rem;
   font-weight: bold;
   color: #ffd700;
-  text-shadow: 0 0 10px #ffd700;
+  text-shadow: 0 0 15px #ffd700;
   display: none;
 }
 #controls {
@@ -146,7 +146,7 @@ h1 {
 </head>
 <body>
 
-<h1>RSTV Social Dance 4.0 Épico</h1>
+<h1>RSTV Social Dance 5.0 Showtime</h1>
 
 <button id="startBtn">¡Comenzar Juego!</button>
 
@@ -183,14 +183,16 @@ let combo = 0;
 let speed = 3;
 let intervalCreate = 1000;
 let record = localStorage.getItem("danceRecord") || 0;
-
 let gameStarted = false;
 const music = document.getElementById("music");
 
 const hitStart = game.clientHeight - 80;
 const hitEnd = game.clientHeight - 30;
 
-// Iniciar juego con botón
+// Parámetros BPM (beats por minuto)
+const BPM = 120; // Ajusta según la canción
+const msPerBeat = 60000 / BPM;
+
 document.getElementById("startBtn").addEventListener("click", () => {
   if(!gameStarted){
     music.play();
@@ -208,12 +210,9 @@ function createArrow(){
   arrow.classList.add("arrow");
   arrow.textContent = symbol;
   arrow.dataset.key = key;
-
-  // Posicionar sobre el socket exacto
   const socketRect = sockets[index].getBoundingClientRect();
   const gameRect = game.getBoundingClientRect();
   arrow.style.left = socketRect.left - gameRect.left + "px";
-
   arrow.style.top = "-60px";
   game.appendChild(arrow);
   arrows.push(arrow);
@@ -235,7 +234,7 @@ function moveArrows(){
 }
 
 function createParticles(x, y){
-  for(let i=0;i<8;i++){
+  for(let i=0;i<12;i++){
     const p = document.createElement("div");
     p.classList.add("particles");
     p.style.left = x + "px";
@@ -259,10 +258,8 @@ function checkArrow(keyPressed){
       const index = keys.indexOf(keyPressed);
       const socket = sockets[index];
       createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
-
       socket.classList.add("active");
       setTimeout(()=>socket.classList.remove("active"),200);
-
       speed += 0.05;
       if(intervalCreate>400) intervalCreate -=5;
       if(score>record){
@@ -299,12 +296,14 @@ function updateScore(){
   scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo} | Récord: ${record}`;
 }
 
+// Loop de movimiento
 setInterval(moveArrows,20);
 
+// Loop de creación sincronizada al BPM
 function arrowLoop(){
   if(gameStarted){
     createArrow();
-    setTimeout(arrowLoop, intervalCreate);
+    setTimeout(arrowLoop, msPerBeat);
   }
 }
 </script>
