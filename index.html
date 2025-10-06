@@ -176,6 +176,248 @@
       <h1>Coreografías</h1>
       <p>Aquí puedes pegar el menú desplegable de coreografías.</p>
       <!-- 🔽 Pega tu menú desplegable aquí -->
+      <style>
+    /* ---------- ESTILOS BASE ---------- */
+    body {
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #000, #1a1a1a, #0d0d0d);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .menu-container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 14px;
+      box-shadow: 0 0 25px rgba(255, 215, 100, 0.15);
+      border: 1px solid rgba(255, 215, 100, 0.25);
+      overflow: hidden;
+    }
+
+    /* ---------- LOGO Y TÍTULO ---------- */
+    .logo-section {
+      text-align: center;
+      padding: 25px 15px 10px;
+      background: linear-gradient(180deg, #0a0a0a, #111);
+      border-bottom: 1px solid rgba(255, 215, 100, 0.15);
+    }
+
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #d4af37, #b8860b, #c5a74e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      display: inline-block;
+      letter-spacing: 1.5px;
+      animation: shine 6s linear infinite;
+    }
+
+    @keyframes shine {
+      0% { background-position: -200px 0; }
+      100% { background-position: 200px 0; }
+    }
+
+    .logo-sub {
+      font-size: 1rem;
+      color: #c5a74e;
+      letter-spacing: 1px;
+      margin-top: 5px;
+      opacity: 0.9;
+    }
+
+    h2 {
+      text-align: center;
+      padding: 15px;
+      margin: 0;
+      background: linear-gradient(90deg, #d4af37, #b8860b, #d4af37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ---------- MENÚ ---------- */
+    .menu-item {
+      border-top: 1px solid rgba(255, 215, 100, 0.15);
+    }
+
+    .menu-header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(90deg, #000, #141414, #000);
+      padding: 15px 20px;
+      cursor: pointer;
+      color: #d4af37;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      z-index: 2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-header:hover {
+      background: linear-gradient(90deg, #d4af37, #b8860b, #000);
+      color: #000;
+    }
+
+    .arrow {
+      transition: transform 0.3s ease;
+    }
+
+    /* ---------- CONTENIDO DESPLEGABLE ---------- */
+    .menu-content {
+      display: none;
+      background: rgba(0, 0, 0, 0.95);
+      overflow-y: auto;
+      max-height: 80vh;
+      padding: 10px;
+    }
+
+    .menu-content iframe {
+      width: 100%;
+      min-height: 600px;
+      border: none;
+      border-radius: 10px;
+      background: #000;
+    }
+
+    /* ---------- CUANDO SE ABRE ---------- */
+    .active .menu-content {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .active .arrow {
+      transform: rotate(180deg);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- SCROLL DORADO ---------- */
+    .menu-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .menu-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #b8860b, #d4af37);
+      border-radius: 4px;
+    }
+
+    .menu-content::-webkit-scrollbar-track {
+      background: #111;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 600px) {
+      .menu-container {
+        width: 95%;
+        border-radius: 10px;
+      }
+
+      .logo-text {
+        font-size: 1.4rem;
+      }
+
+      h2 {
+        font-size: 1.1rem;
+      }
+
+      .menu-header {
+        font-size: 0.9rem;
+      }
+
+      .menu-content iframe {
+        min-height: 480px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      .menu-content iframe {
+        min-height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="menu-container">
+    <!-- Logo -->
+    <div class="logo-section">
+      <div class="logo-text">RSTV Social Dance</div>
+      <div class="logo-sub">Movimiento, Ritmo y Estilo</div>
+    </div>
+
+    <h2>🎬 Mis Videos de Instagram</h2>
+
+    <!-- VIDEO 1 -->
+    <div class="menu-item">
+      <div class="menu-header">
+        <span>Tropiflow en acción</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="menu-content">
+        <iframe src="https://www.instagram.com/p/XXXXXXXX/embed" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <!-- VIDEO 2 -->
+    <div class="menu-item">
+      <div class="menu-header">
+        <span>Baile Social Dance</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="menu-content">
+        <iframe src="https://www.instagram.com/p/YYYYYYYY/embed" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <!-- VIDEO 3 -->
+    <div class="menu-item">
+      <div class="menu-header">
+        <span>Barrio Flow Dorado</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="menu-content">
+        <iframe src="https://www.instagram.com/p/ZZZZZZZZ/embed" allowfullscreen></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Control del despliegue del menú
+    const headers = document.querySelectorAll('.menu-header');
+
+    headers.forEach(header => {
+      header.addEventListener('click', () => {
+        const item = header.parentElement;
+        const isActive = item.classList.contains('active');
+
+        // Cierra todos los demás
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+
+        // Abre el actual si no estaba activo
+        if (!isActive) item.classList.add('active');
+      });
+    });
+  </script>
+
       <div id="menu-coreografias"></div>
     </section>
 
