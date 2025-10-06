@@ -8,7 +8,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Poppins', sans-serif;
-      background: #111;
+      background: linear-gradient(180deg, #000 0%, #111 100%);
       color: #fff;
       overflow-x: hidden;
       display: flex;
@@ -19,27 +19,32 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 220px;
+      width: 230px;
       height: 100%;
-      background: #1e1e1e;
+      background: linear-gradient(180deg, #000, #1a1a1a 80%);
+      box-shadow: 3px 0 10px rgba(255, 215, 0, 0.3);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding-top: 40px;
-      border-right: 3px solid #ff4081;
+      border-right: 2px solid rgba(255, 215, 0, 0.5);
       transition: transform 0.3s ease;
       z-index: 1000;
     }
 
     .sidebar h2 {
-      color: #ff4081;
-      margin-bottom: 30px;
+      background: linear-gradient(90deg, #ffd700, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.8em;
+      margin-bottom: 35px;
+      letter-spacing: 1px;
     }
 
     .sidebar a {
       text-decoration: none;
       color: #fff;
-      background: #333;
+      background: linear-gradient(90deg, #111, #222);
       padding: 12px 20px;
       margin: 8px 0;
       border-radius: 10px;
@@ -47,18 +52,20 @@
       text-align: center;
       transition: 0.3s;
       font-weight: 600;
+      border: 1px solid rgba(255, 215, 0, 0.3);
     }
 
     .sidebar a:hover {
-      background: #ff4081;
-      color: #fff;
-      transform: scale(1.05);
+      background: linear-gradient(90deg, #ffd700, #fff);
+      color: #000;
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
     }
 
     /* ======= CONTENIDO ======= */
     main {
-      margin-left: 220px;
-      width: calc(100% - 220px);
+      margin-left: 230px;
+      width: calc(100% - 230px);
       transition: margin-left 0.3s ease;
     }
 
@@ -70,21 +77,22 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      background: radial-gradient(circle at center, #111 0%, #000 100%);
+      border-bottom: 1px solid rgba(255, 215, 0, 0.1);
     }
-
-    section:nth-child(odd) { background: #222; }
-    section:nth-child(even) { background: #111; }
 
     h1 {
       font-size: 2.5em;
-      color: #ff4081;
+      background: linear-gradient(90deg, #ffd700, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 15px;
     }
 
     p {
-      max-width: 600px;
-      color: #ddd;
-      line-height: 1.6;
+      max-width: 650px;
+      color: #ccc;
+      line-height: 1.7;
       font-size: 1.1em;
     }
 
@@ -94,14 +102,31 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      background: #ff4081;
+      background: linear-gradient(90deg, #ffd700, #fff);
       border: none;
-      color: white;
+      color: #000;
       padding: 10px 15px;
       font-size: 22px;
       border-radius: 8px;
       z-index: 1100;
       cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      transition: transform 0.2s ease;
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* ======= CONTENEDORES ESPECIALES ======= */
+    #contenedor-juego {
+      margin-top: 20px;
+      width: 100%;
+      height: 500px;
+      background: linear-gradient(135deg, #000, #1a1a1a);
+      border: 2px solid rgba(255, 215, 0, 0.5);
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
     }
 
     /* ======= RESPONSIVE ======= */
@@ -127,7 +152,7 @@
 </head>
 <body>
 
-  <!-- Botón para abrir/cerrar menú en móvil -->
+  <!-- Botón menú móvil -->
   <button class="menu-toggle">☰</button>
 
   <!-- Menú lateral -->
@@ -140,11 +165,11 @@
     <a href="#nosotros">Nosotros</a>
   </div>
 
-  <!-- Contenido principal -->
+  <!-- Contenido -->
   <main>
     <section id="inicio">
       <h1>Bienvenido a RSTV Social Dance</h1>
-      <p>Donde el ritmo, el arte y la comunidad se unen 💃🕺</p>
+      <p>Donde el ritmo, el arte y la comunidad brillan como el oro 🖤✨</p>
     </section>
 
     <section id="coreografias">
@@ -156,21 +181,19 @@
 
     <section id="bailes">
       <h1>Bailes</h1>
-      <p>Explora nuestros estilos más populares, desde salsa y bachata hasta cumbia urbana.</p>
+      <p>Explora nuestros estilos más populares — cumbia, salsa, bachata y más — con un toque RSTV.</p>
     </section>
 
     <section id="juego">
       <h1>Juego</h1>
       <p>Pega aquí tu juego de baile interactivo.</p>
       <!-- 🔽 Pega tu juego aquí -->
-      <div id="contenedor-juego" style="margin-top:20px; width:100%; height:500px; background:#000; border:2px dashed #ff4081;">
-        <!-- Juego irá aquí -->
-      </div>
+      <div id="contenedor-juego"></div>
     </section>
 
     <section id="nosotros">
       <h1>Nosotros</h1>
-      <p>Somos RSTV Social Dance: pasión, energía y comunidad en cada paso.</p>
+      <p>Somos RSTV Social Dance: una familia donde el movimiento se convierte en arte.</p>
     </section>
   </main>
 
@@ -188,7 +211,7 @@
       });
     });
 
-    // Activar menú móvil
+    // Menú móvil
     document.querySelector('.menu-toggle').addEventListener('click', () => {
       document.querySelector('.sidebar').classList.toggle('active');
     });
