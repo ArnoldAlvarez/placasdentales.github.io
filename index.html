@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juego de Baile RSTV Ultra PRO</title>
+<title>Juego de Baile RSTV Socket</title>
 <style>
 body {
   margin: 0;
@@ -37,9 +37,27 @@ h1 {
   bottom: 20px;
   width: 100%;
   height: 50px;
-  border-top: 2px solid #d4af37;
   display: flex;
   justify-content: space-around;
+}
+.socket {
+  width: 22%;
+  max-width: 60px;
+  height: 50px;
+  border: 2px dashed #d4af37;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4af37;
+  font-size: 1.5rem;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.socket.active {
+  background: #ffd700;
+  box-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700;
+  color: #000;
+  transform: scale(1.2);
 }
 .arrow {
   width: 22%;
@@ -61,7 +79,7 @@ h1 {
 }
 @keyframes hitFlash {
   0% { transform: scale(1); color: #d4af37;}
-  50% { transform: scale(1.3); color: #fff;}
+  50% { transform: scale(1.5); color: #fff;}
   100% { transform: scale(1); color: #d4af37;}
 }
 .particles {
@@ -114,17 +132,30 @@ h1 {
   background: #ffd700;
   color: #000;
 }
+#startBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  background: #000;
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  border-radius: 10px;
+}
+#startBtn:hover {cursor: pointer;}
 </style>
 </head>
 <body>
 
-<h1>RSTV Social Dance Ultra PRO</h1>
+<h1>RSTV Social Dance Ultra Socket</h1>
+
+<button id="startBtn">¡Comenzar Juego!</button>
+
 <div id="game">
   <div class="hit-zone">
-    <div>↑</div>
-    <div>↓</div>
-    <div>←</div>
-    <div>→</div>
+    <div class="socket">↑</div>
+    <div class="socket">↓</div>
+    <div class="socket">←</div>
+    <div class="socket">→</div>
   </div>
   <div id="comboDisplay">COMBO!</div>
 </div>
@@ -137,12 +168,13 @@ h1 {
   <button data-key="ArrowRight">→</button>
 </div>
 
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
 const game = document.getElementById("game");
 const scoreDisplay = document.getElementById("score");
 const comboDisplay = document.getElementById("comboDisplay");
+const sockets = document.querySelectorAll(".socket");
 const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
 const symbols = ["↑","↓","←","→"];
 let arrows = [];
@@ -151,8 +183,21 @@ let combo = 0;
 let speed = 3;
 let intervalCreate = 1000;
 
+let gameStarted = false;
+const music = document.getElementById("music");
+
 const hitStart = game.clientHeight - 80;
 const hitEnd = game.clientHeight - 30;
+
+// Iniciar juego con botón
+document.getElementById("startBtn").addEventListener("click", () => {
+  if(!gameStarted){
+    music.play();
+    gameStarted = true;
+    arrowLoop();
+    document.getElementById("startBtn").style.display="none";
+  }
+});
 
 // Crear flecha
 function createArrow(){
@@ -185,7 +230,7 @@ function moveArrows(){
   });
 }
 
-// Crear partículas doradas al acertar
+// Crear partículas doradas
 function createParticles(x, y){
   for(let i=0;i<8;i++){
     const p = document.createElement("div");
@@ -210,6 +255,11 @@ function checkArrow(keyPressed){
       updateScore();
       updateComboDisplay();
       createParticles(parseInt(arrow.style.left), top);
+
+      // Brillo socket
+      sockets[keys.indexOf(keyPressed)].classList.add("active");
+      setTimeout(()=>sockets[keys.indexOf(keyPressed)].classList.remove("active"),200);
+
       speed += 0.05;
       if(intervalCreate>400) intervalCreate -=5;
     }
@@ -251,10 +301,11 @@ setInterval(moveArrows,20);
 
 // Loop de creación de flechas
 function arrowLoop(){
-  createArrow();
-  setTimeout(arrowLoop, intervalCreate);
+  if(gameStarted){
+    createArrow();
+    setTimeout(arrowLoop, intervalCreate);
+  }
 }
-arrowLoop();
 </script>
 
 </body>
