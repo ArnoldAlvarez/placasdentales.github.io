@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juego de Baile PRO RSTV</title>
+<title>Juego de Baile RSTV Ultra PRO</title>
 <style>
 body {
   margin: 0;
@@ -24,7 +24,8 @@ h1 {
 }
 #game {
   position: relative;
-  width: 300px;
+  width: 90%;
+  max-width: 360px;
   height: 500px;
   background: rgba(0,0,0,0.85);
   border: 2px solid #d4af37;
@@ -41,7 +42,8 @@ h1 {
   justify-content: space-around;
 }
 .arrow {
-  width: 50px;
+  width: 22%;
+  max-width: 60px;
   height: 50px;
   text-align: center;
   line-height: 50px;
@@ -62,16 +64,61 @@ h1 {
   50% { transform: scale(1.3); color: #fff;}
   100% { transform: scale(1); color: #d4af37;}
 }
+.particles {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle,#ffd700,#b8860b);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.8;
+  animation: particleMove 0.8s forwards;
+}
+@keyframes particleMove {
+  0% { transform: translateY(0) scale(1);}
+  100% { transform: translateY(-50px) translateX(30px) scale(0); opacity: 0;}
+}
 #score {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 1.2rem;
   color: #d4af37;
+}
+#comboDisplay {
+  position: absolute;
+  top: 30%;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 10px #ffd700;
+  display: none;
+}
+#controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+#controls button {
+  width: 60px;
+  height: 60px;
+  font-size: 2rem;
+  background: #000;
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+  color: #d4af37;
+  font-weight: bold;
+  transition: transform 0.1s ease, background 0.2s;
+}
+#controls button:active {
+  transform: scale(1.2);
+  background: #ffd700;
+  color: #000;
 }
 </style>
 </head>
 <body>
 
-<h1>RSTV Social Dance PRO</h1>
+<h1>RSTV Social Dance Ultra PRO</h1>
 <div id="game">
   <div class="hit-zone">
     <div>↑</div>
@@ -79,17 +126,23 @@ h1 {
     <div>←</div>
     <div>→</div>
   </div>
+  <div id="comboDisplay">COMBO!</div>
 </div>
 <div id="score">Puntaje: 0 | Combo: 0</div>
 
-<!-- Música opcional -->
+<div id="controls">
+  <button data-key="ArrowUp">↑</button>
+  <button data-key="ArrowDown">↓</button>
+  <button data-key="ArrowLeft">←</button>
+  <button data-key="ArrowRight">→</button>
+</div>
+
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
 
 <script>
 const game = document.getElementById("game");
 const scoreDisplay = document.getElementById("score");
-const music = document.getElementById("music");
-
+const comboDisplay = document.getElementById("comboDisplay");
 const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
 const symbols = ["↑","↓","←","→"];
 let arrows = [];
@@ -98,8 +151,8 @@ let combo = 0;
 let speed = 3;
 let intervalCreate = 1000;
 
-const hitStart = 420;
-const hitEnd = 470;
+const hitStart = game.clientHeight - 80;
+const hitEnd = game.clientHeight - 30;
 
 // Crear flecha
 function createArrow(){
@@ -110,7 +163,7 @@ function createArrow(){
   arrow.classList.add("arrow");
   arrow.textContent = symbol;
   arrow.dataset.key = key;
-  arrow.style.left = 60*index + "px";
+  arrow.style.left = 22*index + "%";
   arrow.style.top = "-60px";
   game.appendChild(arrow);
   arrows.push(arrow);
@@ -121,35 +174,74 @@ function moveArrows(){
   arrows.forEach((arrow,i)=>{
     let top = parseInt(arrow.style.top);
     arrow.style.top = top + speed + "px";
-
     if(top > game.clientHeight){
       game.removeChild(arrow);
       arrows.splice(i,1);
       combo = 0;
+      updateComboDisplay();
       score -= 5;
       updateScore();
     }
   });
 }
 
-// Detectar aciertos
-document.addEventListener("keydown",(e)=>{
+// Crear partículas doradas al acertar
+function createParticles(x, y){
+  for(let i=0;i<8;i++){
+    const p = document.createElement("div");
+    p.classList.add("particles");
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+    game.appendChild(p);
+    setTimeout(()=>p.remove(),800);
+  }
+}
+
+// Función de acierto
+function checkArrow(keyPressed){
   arrows.forEach((arrow,i)=>{
     let top = parseInt(arrow.style.top);
-    if(e.key === arrow.dataset.key && top >= hitStart && top <= hitEnd){
-      // Animación hit
+    if(keyPressed === arrow.dataset.key && top >= hitStart && top <= hitEnd){
       arrow.classList.add("hit");
       setTimeout(()=>arrow.remove(),300);
       arrows.splice(i,1);
       score += 10 + combo*2;
-      combo += 1;
+      combo +=1;
       updateScore();
-      speed += 0.05; // aumenta velocidad progresiva
-      if(intervalCreate>400) intervalCreate -=5; // aumenta frecuencia
+      updateComboDisplay();
+      createParticles(parseInt(arrow.style.left), top);
+      speed += 0.05;
+      if(intervalCreate>400) intervalCreate -=5;
     }
+  });
+}
+
+// Mostrar combo grande
+function updateComboDisplay(){
+  if(combo>=3){
+    comboDisplay.style.display="block";
+    comboDisplay.textContent = `COMBO x${combo}!`;
+    comboDisplay.style.opacity=1;
+    setTimeout(()=>comboDisplay.style.opacity=0,400);
+  }else{
+    comboDisplay.style.display="none";
+  }
+}
+
+// Detectar teclado
+document.addEventListener("keydown",(e)=>{
+  checkArrow(e.key);
+});
+
+// Detectar botones táctiles
+const controlButtons = document.querySelectorAll("#controls button");
+controlButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    checkArrow(btn.dataset.key);
   });
 });
 
+// Actualizar puntaje
 function updateScore(){
   scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo}`;
 }
@@ -157,7 +249,7 @@ function updateScore(){
 // Loop de movimiento
 setInterval(moveArrows,20);
 
-// Loop de creación de flechas con velocidad progresiva
+// Loop de creación de flechas
 function arrowLoop(){
   createArrow();
   setTimeout(arrowLoop, intervalCreate);
