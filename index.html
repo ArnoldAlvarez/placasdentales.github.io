@@ -1,312 +1,629 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSTV Social Dance 5.0 Showtime</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RSTV Social Dance - Showtime Extremo</title>
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg,#000,#111);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-}
-h1 {
-  margin-top: 20px;
-  text-align: center;
-  background: linear-gradient(90deg,#d4af37,#b8860b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-#game {
-  position: relative;
-  width: 90%;
-  max-width: 360px;
-  height: 500px;
-  background: rgba(0,0,0,0.85);
-  border: 2px solid #d4af37;
-  margin-top: 20px;
-  overflow: hidden;
-}
-.hit-zone {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: space-around;
-}
-.socket {
-  width: 22%;
-  max-width: 60px;
-  height: 50px;
-  border: 2px dashed #d4af37;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d4af37;
-  font-size: 1.5rem;
-  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
-}
-.socket.active {
-  background: #ffd700;
-  box-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700;
-  color: #000;
-  transform: scale(1.2);
-}
-.arrow {
-  width: 22%;
-  max-width: 60px;
-  height: 50px;
-  text-align: center;
-  line-height: 50px;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #d4af37;
-  border: 2px solid #b8860b;
-  border-radius: 8px;
-  position: absolute;
-  top: 0;
-  transition: top 0.02s linear, transform 0.2s ease;
-}
-.arrow.hit {
-  animation: hitFlash 0.3s forwards;
-}
-@keyframes hitFlash {
-  0% { transform: scale(1); color: #d4af37;}
-  50% { transform: scale(1.5); color: #fff;}
-  100% { transform: scale(1); color: #d4af37;}
-}
-.particles {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: radial-gradient(circle,#ffd700,#b8860b);
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0.8;
-  animation: particleMove 0.8s forwards;
-}
-@keyframes particleMove {
-  0% { transform: translateY(0) scale(1);}
-  100% { transform: translateY(-50px) translateX(30px) scale(0); opacity: 0;}
-}
-#score {
-  margin-top: 15px;
-  font-size: 1.2rem;
-  color: #d4af37;
-}
-#comboDisplay {
-  position: absolute;
-  top: 25%;
-  font-size: 3rem;
-  font-weight: bold;
-  color: #ffd700;
-  text-shadow: 0 0 15px #ffd700;
-  display: none;
-}
-#controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-#controls button {
-  width: 60px;
-  height: 60px;
-  font-size: 2rem;
-  background: #000;
-  border: 2px solid #d4af37;
-  border-radius: 10px;
-  color: #d4af37;
-  font-weight: bold;
-  transition: transform 0.1s ease, background 0.2s;
-}
-#controls button:active {
-  transform: scale(1.2);
-  background: #ffd700;
-  color: #000;
-}
-#startBtn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1.5rem;
-  background: #000;
-  border: 2px solid #d4af37;
-  color: #d4af37;
-  border-radius: 10px;
-}
-#startBtn:hover {cursor: pointer;}
+  :root{
+    --gold-1: #ffd700;
+    --gold-2: #b8860b;
+    --bg-dark: #070707;
+    --panel: rgba(0,0,0,0.85);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Poppins", sans-serif;
+    background: radial-gradient(circle at 10% 10%, #0b0b0b, #050505 40%, #000 100%);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+    overflow:hidden;
+  }
+
+  header{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px;
+    gap:12px;
+    position:fixed;
+    top:0;
+    z-index:999;
+    background:linear-gradient(90deg, rgba(0,0,0,0.45), rgba(10,10,10,0.4));
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid rgba(255,215,0,0.06);
+  }
+  .brand{
+    font-weight:800;
+    letter-spacing:1.2px;
+    background: linear-gradient(90deg,var(--gold-1),var(--gold-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform:uppercase;
+  }
+  .controls-quick{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .btn{
+    background:#000;
+    color:var(--gold-1);
+    border:2px solid rgba(212,175,55,0.25);
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  /* Game area */
+  main{ padding-top:72px; width:100%; display:flex; justify-content:center; align-items:flex-start; padding-bottom:40px; }
+
+  #stage{
+    width:92%;
+    max-width:420px;
+    height:560px;
+    background:var(--panel);
+    border:2px solid rgba(212,175,55,0.12);
+    border-radius:12px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 8px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+
+  /* stage lights layer */
+  .lights{
+    position:absolute; left:0; top:0; right:0; bottom:0;
+    pointer-events:none;
+    mix-blend-mode: screen;
+    opacity:0.5;
+  }
+  .light {
+    position:absolute;
+    width:220px;height:220px;border-radius:50%;
+    background: radial-gradient(circle, rgba(255,215,0,0.35), rgba(255,215,0,0.06) 40%, transparent 60%);
+    filter: blur(28px);
+    transform: scale(0.8);
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+
+  /* moving background pulse (beat) */
+  .stage-pulse{ position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity 0.06s linear; }
+  .stage-pulse.on{ opacity:0.12; background: linear-gradient(180deg, rgba(255,215,0,0.02), transparent 40%); }
+
+  /* hit zone / sockets */
+  .hit-row{
+    position:absolute;
+    bottom:18px;
+    left:0; right:0;
+    display:flex;
+    justify-content:space-around;
+    padding:0 10px;
+    gap:6px;
+    z-index:40;
+  }
+  .socket{
+    flex:1 1 0; max-width:76px; height:56px;
+    border-radius:10px;
+    border:2px dashed rgba(212,175,55,0.22);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold-1); font-weight:800; font-size:1.1rem;
+    transition: all 0.18s ease;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));
+  }
+  .socket.active{
+    background: radial-gradient(circle, rgba(255,215,0,1), rgba(255,215,0,0.8) 30%, rgba(0,0,0,0) 60%);
+    color:#000; transform:scale(1.18); box-shadow: 0 0 28px rgba(255,215,0,0.8), 0 0 64px rgba(255,215,0,0.35);
+    border-style:solid; border-color: rgba(255,215,0,0.6);
+  }
+
+  /* falling arrows */
+  .playfield{ position:absolute; inset:0; z-index:10; pointer-events:none; }
+  .arrow{
+    position:absolute;
+    width:64px; height:56px; border-radius:8px; text-align:center; font-size:1.6rem;
+    line-height:56px; font-weight:900; color:var(--gold-1); border:2px solid rgba(184,134,11,0.9);
+    background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+    transition: transform 0.08s linear;
+    will-change: transform, top;
+    z-index:20;
+  }
+  .arrow.hit{ animation: hitFlash 0.36s forwards; }
+  @keyframes hitFlash{
+    0%{ transform: scale(1); filter: drop-shadow(0 0 6px rgba(255,215,0,0.6)); }
+    50%{ transform: scale(1.6); color:white; filter: drop-shadow(0 0 18px rgba(255,215,0,0.95)); }
+    100%{ transform: scale(1); filter:none; }
+  }
+
+  /* particles and big explosion */
+  .particle{
+    position:absolute; width:12px; height:12px; border-radius:50%;
+    background: radial-gradient(circle,#ffd700,#b8860b); pointer-events:none;
+    transform-origin:center;
+    z-index:30;
+    animation: floatUp 0.9s forwards ease-out;
+  }
+  @keyframes floatUp{
+    0%{transform:translate(0,0) scale(1); opacity:1}
+    100%{transform:translate(40px,-90px) scale(0.1); opacity:0}
+  }
+  .big-explosion{
+    position:absolute; width:160px; height:160px; left:50%; top:50%;
+    transform:translate(-50%,-50%) scale(0.2); border-radius:50%;
+    background: radial-gradient(circle, rgba(255,215,0,1), rgba(255,215,0,0.3) 35%, transparent 60%);
+    filter: blur(14px); opacity:0; z-index:60; pointer-events:none;
+    transition: transform 0.45s cubic-bezier(.2,.9,.2,1), opacity 0.45s;
+  }
+  .big-explosion.on{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+
+  /* scoreboard / info */
+  .hud{ margin-top:14px; display:flex; gap:12px; align-items:center; color:var(--gold-1) }
+  .hud .stat{ background:rgba(0,0,0,0.45); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,215,0,0.06) }
+
+  /* touch controls */
+  #touchControls{ display:flex; gap:10px; margin-top:10px; }
+  #touchControls button{ width:64px; height:64px; border-radius:10px; font-size:1.6rem;
+    background:#000; border:2px solid rgba(212,175,55,0.2); color:var(--gold-1); font-weight:900; }
+
+  /* leaderboard modal */
+  .modal{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:9999;
+    background: rgba(0,0,0,0.6);
+  }
+  .modal .card{
+    width:92%; max-width:520px; background:linear-gradient(180deg, #0a0a0a, #070707); border-radius:12px; padding:18px;
+    border:1px solid rgba(255,215,0,0.06);
+  }
+  .leaderboard{ margin-top:8px; display:flex; flex-direction:column; gap:8px; }
+  .lb-row{ display:flex; justify-content:space-between; padding:8px; border-radius:8px; background:linear-gradient(90deg, rgba(255,215,0,0.03), transparent); }
+  .small{ font-size:0.85rem; color:#ccc }
+  /* responsive tweaks */
+  @media (max-width:420px){
+    .arrow{ width:18%; left:auto; right:auto; max-width:56px; }
+    .socket{ max-width:64px; height:52px }
+    #stage{ height:520px }
+  }
 </style>
 </head>
 <body>
 
-<h1>RSTV Social Dance 5.0 Showtime</h1>
-
-<button id="startBtn">¡Comenzar Juego!</button>
-
-<div id="game">
-  <div class="hit-zone">
-    <div class="socket" data-key="ArrowUp">↑</div>
-    <div class="socket" data-key="ArrowDown">↓</div>
-    <div class="socket" data-key="ArrowLeft">←</div>
-    <div class="socket" data-key="ArrowRight">→</div>
+<header>
+  <div class="brand">RSTV Social Dance</div>
+  <div class="controls-quick">
+    <button id="startBtn" class="btn">¡Comenzar Juego!</button>
+    <button id="showLB" class="btn">Ranking</button>
   </div>
-  <div id="comboDisplay">COMBO!</div>
-</div>
-<div id="score">Puntaje: 0 | Combo: 0 | Récord: 0</div>
+</header>
 
-<div id="controls">
-  <button data-key="ArrowUp">↑</button>
-  <button data-key="ArrowDown">↓</button>
-  <button data-key="ArrowLeft">←</button>
-  <button data-key="ArrowRight">→</button>
+<main>
+  <section id="stage" aria-label="Area de juego">
+    <div class="lights">
+      <div id="light1" class="light" style="left: -60px; top: -40px"></div>
+      <div id="light2" class="light" style="right: -80px; top: -20px"></div>
+    </div>
+    <div class="stage-pulse" id="stagePulse"></div>
+
+    <div class="playfield" id="playfield"></div>
+
+    <div class="hit-row" id="hitRow" aria-hidden="false">
+      <div class="socket" data-key="ArrowUp">↑</div>
+      <div class="socket" data-key="ArrowDown">↓</div>
+      <div class="socket" data-key="ArrowLeft">←</div>
+      <div class="socket" data-key="ArrowRight">→</div>
+    </div>
+
+    <div class="big-explosion" id="bigExplosion"></div>
+
+  </section>
+
+  <div class="hud">
+    <div class="stat" id="scoreBox">Puntaje: 0</div>
+    <div class="stat" id="comboBox">Combo: 0</div>
+    <div class="stat small" id="timeBox">Tiempo: 60s</div>
+    <div class="stat small" id="levelBox">Nivel: 1</div>
+  </div>
+
+  <div id="touchControls">
+    <button data-key="ArrowUp">↑</button>
+    <button data-key="ArrowDown">↓</button>
+    <button data-key="ArrowLeft">←</button>
+    <button data-key="ArrowRight">→</button>
+  </div>
+
+</main>
+
+<!-- Leaderboard modal -->
+<div id="modal" class="modal" role="dialog" aria-modal="true">
+  <div class="card">
+    <h3>Ranking RSTV - Top 5</h3>
+    <div id="leaderboard" class="leaderboard"></div>
+    <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end">
+      <button id="closeLB" class="btn">Cerrar</button>
+    </div>
+  </div>
 </div>
 
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+<!-- Save score modal -->
+<div id="saveModal" class="modal">
+  <div class="card">
+    <h3>¡Partida Terminada!</h3>
+    <div class="small">Tu puntaje: <strong id="finalScore">0</strong></div>
+    <div style="margin-top:12px">
+      <input id="playerName" placeholder="Tu nombre" style="width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:#060606; color:#fff">
+    </div>
+    <div style="display:flex; gap:8px; margin-top:12px; justify-content:flex-end">
+      <button id="saveScoreBtn" class="btn">Guardar</button>
+      <button id="skipSave" class="btn">Saltar</button>
+    </div>
+  </div>
+</div>
+
+<!-- audio (demo track) -->
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
 
 <script>
-const game = document.getElementById("game");
-const scoreDisplay = document.getElementById("score");
-const comboDisplay = document.getElementById("comboDisplay");
-const sockets = document.querySelectorAll(".socket");
-const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
-const symbols = ["↑","↓","←","→"];
-let arrows = [];
-let score = 0;
-let combo = 0;
-let speed = 3;
-let intervalCreate = 1000;
-let record = localStorage.getItem("danceRecord") || 0;
-let gameStarted = false;
-const music = document.getElementById("music");
-
-const hitStart = game.clientHeight - 80;
-const hitEnd = game.clientHeight - 30;
-
-// Parámetros BPM (beats por minuto)
-const BPM = 120; // Ajusta según la canción
+/* ==== CONFIG & STATE ==== */
+const BPM = 118; // si cambias la canción ajusta BPM
+const GAME_TIME = 60; // duración en segundos por ronda
 const msPerBeat = 60000 / BPM;
 
-document.getElementById("startBtn").addEventListener("click", () => {
-  if(!gameStarted){
-    music.play();
-    gameStarted = true;
-    arrowLoop();
-    document.getElementById("startBtn").style.display="none";
-  }
-});
+const stage = document.getElementById('stage');
+const playfield = document.getElementById('playfield');
+const sockets = Array.from(document.querySelectorAll('.socket'));
+const playTimeBox = document.getElementById('timeBox');
+const levelBox = document.getElementById('levelBox');
+const scoreBox = document.getElementById('scoreBox');
+const comboBox = document.getElementById('comboBox');
+const stagePulse = document.getElementById('stagePulse');
+const light1 = document.getElementById('light1'), light2 = document.getElementById('light2');
+const bigExplosion = document.getElementById('bigExplosion');
+const music = document.getElementById('music');
 
-function createArrow(){
-  const index = Math.floor(Math.random()*4);
-  const key = keys[index];
-  const symbol = symbols[index];
-  const arrow = document.createElement("div");
-  arrow.classList.add("arrow");
-  arrow.textContent = symbol;
-  arrow.dataset.key = key;
-  const socketRect = sockets[index].getBoundingClientRect();
-  const gameRect = game.getBoundingClientRect();
-  arrow.style.left = socketRect.left - gameRect.left + "px";
-  arrow.style.top = "-60px";
-  game.appendChild(arrow);
-  arrows.push(arrow);
+let gameStarted = false;
+let timer = null;
+let remaining = GAME_TIME;
+let score = 0;
+let combo = 0;
+let level = 1;
+let speed = 2.6; // px per frame base
+let beatIntervalId = null;
+let moveIntervalId = null;
+let arrowCreationHandle = null;
+let arrows = []; // {el, key, spawnTime}
+let recordBoardKey = 'rstv_leaderboard_v1';
+const MAX_LEADERBOARD = 5;
+
+/* ==== UTIL ===== */
+function rand(min,max){ return Math.random()*(max-min)+min; }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+/* ==== SYNCED LIGHTS & BEAT PULSE ==== */
+function beatPulse(){
+  // brief stage pulse and lights pop
+  stagePulse.classList.add('on');
+  light1.style.transform = 'scale(1.05)';
+  light2.style.transform = 'scale(1.05)';
+  setTimeout(()=>{
+    stagePulse.classList.remove('on');
+    light1.style.transform = 'scale(0.8)';
+    light2.style.transform = 'scale(0.8)';
+  }, msPerBeat * 0.35);
 }
 
-function moveArrows(){
-  arrows.forEach((arrow,i)=>{
-    let top = parseInt(arrow.style.top);
-    arrow.style.top = top + speed + "px";
-    if(top > game.clientHeight){
-      game.removeChild(arrow);
+/* ==== ARROW CREATION aligned to sockets ==== */
+const keys = ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
+const symbols = ["↑","↓","←","→"];
+
+function createArrowForIndex(index){
+  const socket = sockets[index];
+  const socketRect = socket.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+
+  const el = document.createElement('div');
+  el.className = 'arrow';
+  el.textContent = symbols[index];
+  el.dataset.key = keys[index];
+
+  // position absolute relative to stage
+  const left = socketRect.left - stageRect.left;
+  // center arrow horizontally to socket (account for width)
+  el.style.left = (left) + 'px';
+  el.style.top = '-80px';
+  playfield.appendChild(el);
+  arrows.push({el, key: keys[index]});
+}
+
+function createArrowRandom(){
+  const idx = Math.floor(Math.random()*4);
+  createArrowForIndex(idx);
+}
+
+/* ==== MOVEMENT LOOP ==== */
+function moveLoop(){
+  // run frequently (60fps ideally)
+  arrows.forEach((a, i) => {
+    const el = a.el;
+    let top = parseFloat(el.style.top) || -80;
+    top += speed; // px per tick
+    el.style.top = top + 'px';
+
+    // if past stage bottom -> miss
+    if(top > stage.clientHeight){
+      // remove
+      el.remove();
       arrows.splice(i,1);
       combo = 0;
-      updateComboDisplay();
-      score -= 5;
-      updateScore();
+      score = Math.max(0, score - 6);
+      updateHUD();
+      maybeLevelDown();
     }
   });
 }
 
-function createParticles(x, y){
-  for(let i=0;i<12;i++){
-    const p = document.createElement("div");
-    p.classList.add("particles");
-    p.style.left = x + "px";
-    p.style.top = y + "px";
-    game.appendChild(p);
-    setTimeout(()=>p.remove(),800);
-  }
+/* ==== HIT DETECTION ==== */
+function inHitWindow(el){
+  // compute position relative to stage height
+  const top = parseFloat(el.style.top) || 0;
+  // tweak hit zone thresholds visually
+  const zoneTop = stage.clientHeight - 100;
+  const zoneBottom = stage.clientHeight - 40;
+  return (top >= zoneTop && top <= zoneBottom);
 }
 
-function checkArrow(keyPressed){
-  arrows.forEach((arrow,i)=>{
-    let top = parseInt(arrow.style.top);
-    if(keyPressed === arrow.dataset.key && top >= hitStart && top <= hitEnd){
-      arrow.classList.add("hit");
-      setTimeout(()=>arrow.remove(),300);
+function onHit(keyPressed){
+  // find nearest arrow that matches and is in hit window
+  for(let i=0;i<arrows.length;i++){
+    const a = arrows[i];
+    if(a.key === keyPressed && inHitWindow(a.el)){
+      // success
+      a.el.classList.add('hit');
+      // center positions for particles
+      const left = a.el.offsetLeft + a.el.offsetWidth/2;
+      const top = parseFloat(a.el.style.top) + a.el.offsetHeight/2;
+      // remove visually after short time
+      setTimeout(()=>{ try{ a.el.remove() }catch(e){} }, 280);
       arrows.splice(i,1);
-      score += 10 + combo*2;
-      combo +=1;
-      updateScore();
-      updateComboDisplay();
-      const index = keys.indexOf(keyPressed);
-      const socket = sockets[index];
-      createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
-      socket.classList.add("active");
-      setTimeout(()=>socket.classList.remove("active"),200);
-      speed += 0.05;
-      if(intervalCreate>400) intervalCreate -=5;
-      if(score>record){
-        record = score;
-        localStorage.setItem("danceRecord", record);
+
+      // score & combo
+      combo += 1;
+      let gained = 10 + Math.floor(combo/2) * 2;
+      score += gained;
+
+      // create particles & possible big explosion
+      spawnParticles(left, top, Math.min(28, 6 + combo));
+      if(combo >= 10){
+        bigExplosion.classList.add('on');
+        setTimeout(()=>bigExplosion.classList.remove('on'), 650);
       }
+
+      // highlight socket
+      const idx = keys.indexOf(keyPressed);
+      if(idx>=0){
+        const socket = sockets[idx];
+        socket.classList.add('active');
+        setTimeout(()=>socket.classList.remove('active'), 200);
+      }
+
+      // level up logic slightly faster per combo thresholds
+      if(combo % 8 === 0) {
+        level++;
+        speed = Math.min(7, speed + 0.5);
+        intervalTighten();
+      }
+
+      // update HUD
+      updateHUD();
+      // return true meaning we consumed hit
+      return true;
+    }
+  }
+  // no matching arrow hit -> penalty
+  combo = 0;
+  score = Math.max(0, score - 4);
+  updateHUD();
+  return false;
+}
+
+/* ==== PARTICLES ==== */
+function spawnParticles(cx, cy, amount=8){
+  for(let i=0;i<amount;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (cx + rand(-20,20)) + 'px';
+    p.style.top = (cy + rand(-10,10)) + 'px';
+    p.style.transform = `translate(0,0) rotate(${rand(0,360)}deg)`;
+    playfield.appendChild(p);
+    setTimeout(()=>p.remove(), 1000 + Math.random()*400);
+  }
+}
+
+/* ==== HUD ==== */
+function updateHUD(){
+  scoreBox.textContent = `Puntaje: ${score}`;
+  comboBox.textContent = `Combo: ${combo}`;
+  playTimeBox.textContent = `Tiempo: ${remaining}s`;
+  levelBox.textContent = `Nivel: ${level}`;
+}
+
+/* ==== LEADERBOARD ==== */
+function loadLeaderboard(){
+  try{
+    const raw = localStorage.getItem(recordBoardKey);
+    if(!raw) return [];
+    return JSON.parse(raw);
+  }catch(e){ return [] }
+}
+function saveLeaderboard(lb){
+  localStorage.setItem(recordBoardKey, JSON.stringify(lb));
+}
+function addScoreToLeaderboard(name, points){
+  const lb = loadLeaderboard();
+  lb.push({name: name || 'Anon', score: points, at: Date.now()});
+  // sort desc and keep top N
+  lb.sort((a,b)=>b.score - a.score);
+  saveLeaderboard(lb.slice(0, MAX_LEADERBOARD));
+}
+function renderLeaderboard(){
+  const lb = loadLeaderboard();
+  const container = document.getElementById('leaderboard');
+  container.innerHTML = '';
+  if(lb.length===0){ container.innerHTML = '<div class="small">No hay puntajes aún. Sé el primero!</div>'; return; }
+  lb.forEach((r, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    row.innerHTML = `<div>${idx+1}. ${r.name}</div><div>${r.score}</div>`;
+    container.appendChild(row);
+  });
+}
+
+/* ==== GAME TIMER & LIFE CYCLE ==== */
+function startGame(){
+  if(gameStarted) return;
+  gameStarted = true;
+  score = 0; combo = 0; level = 1; speed = 2.6; remaining = GAME_TIME;
+  updateHUD();
+  // play music (user gesture allowed because start button was pressed)
+  music.currentTime = 0;
+  music.volume = 0.65;
+  music.play().catch(()=>{ /* ignored */ });
+
+  // beat sync
+  beatIntervalId = setInterval(beatPulse, msPerBeat);
+  // move loop (~60fps)
+  moveIntervalId = setInterval(moveLoop, 1000/60);
+  // arrow creation synced to beat (but with some randomization)
+  arrowCreationHandle = setTimeout(arrowBeatLoop, msPerBeat*0.75);
+
+  // countdown
+  timer = setInterval(()=> {
+    remaining--;
+    if(remaining<=0){
+      endGame();
+    }
+    updateHUD();
+  }, 1000);
+}
+
+function intervalTighten(){
+  // accelerate creation frequency a bit by reducing per-level milliseconds
+  // we don't directly modify msPerBeat (that's from song),
+  // we simply create additional arrows occasionally to increase density
+}
+
+function arrowBeatLoop(){
+  if(!gameStarted) return;
+  // create one or more arrows per beat depending on level and randomness
+  // base chance to spawn 1 arrow per beat
+  const density = clamp(1 + Math.floor(level/2), 1, 3); // more per beat at higher levels
+  for(let i=0;i<density;i++){
+    // sometimes spawn simultaneous arrows for challenge
+    createArrowRandom();
+    // small random extra spawn
+    if(Math.random() < 0.12 + level*0.02) createArrowRandom();
+  }
+  // schedule next beat-aligned spawn
+  arrowCreationHandle = setTimeout(arrowBeatLoop, msPerBeat);
+}
+
+/* ==== INPUT HANDLING (keyboard + touch) ==== */
+document.addEventListener('keydown', (e) => {
+  if(!gameStarted) return;
+  if(keys.includes(e.key)){
+    onHit(e.key);
+    // visual tap on socket for feedback:
+    const idx = keys.indexOf(e.key);
+    if(idx>=0){
+      sockets[idx].classList.add('active');
+      setTimeout(()=>sockets[idx].classList.remove('active'), 160);
+    }
+  }
+});
+document.querySelectorAll('#touchControls button').forEach(btn => {
+  btn.addEventListener('touchstart', (ev)=>{
+    ev.preventDefault();
+    if(!gameStarted) return;
+    const k = btn.dataset.key;
+    onHit(k);
+    btn.classList.add('active');
+    setTimeout(()=>btn.classList.remove('active'),120);
+  }, {passive:false});
+  btn.addEventListener('mousedown', (ev)=>{
+    ev.preventDefault();
+    if(!gameStarted) return;
+    onHit(btn.dataset.key);
+  });
+});
+
+/* ==== START & END ==== */
+document.getElementById('startBtn').addEventListener('click', () => {
+  // start with a small countdown pulse then start
+  startGame();
+  // show a quick flash
+  stagePulse.classList.add('on');
+  setTimeout(()=>stagePulse.classList.remove('on'), 300);
+});
+
+function endGame(){
+  gameStarted = false;
+  clearInterval(moveIntervalId);
+  clearInterval(beatIntervalId);
+  clearInterval(timer);
+  clearTimeout(arrowCreationHandle);
+  // remove remaining arrows
+  arrows.forEach(a=>{ try{ a.el.remove() }catch(e){} });
+  arrows = [];
+  music.pause();
+  // show save modal
+  showSaveModal();
+}
+
+/* ==== MODALS & LEADERBOARD UI ==== */
+const modal = document.getElementById('modal');
+const saveModal = document.getElementById('saveModal');
+
+document.getElementById('showLB').addEventListener('click', ()=>{
+  renderLeaderboard();
+  modal.style.display = 'flex';
+});
+document.getElementById('closeLB').addEventListener('click', ()=> modal.style.display='none');
+
+function showSaveModal(){
+  document.getElementById('finalScore').textContent = score;
+  saveModal.style.display = 'flex';
+}
+document.getElementById('skipSave').addEventListener('click', ()=>{
+  saveModal.style.display='none';
+});
+document.getElementById('saveScoreBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('playerName').value.trim() || 'Jugador';
+  addScoreToLeaderboard(name, score);
+  saveModal.style.display='none';
+  renderLeaderboard();
+  modal.style.display = 'flex';
+});
+
+/* ==== initial UI setup ==== */
+updateHUD();
+renderLeaderboard();
+
+/* ==== window resize: re-position arrows on resize so they still align with sockets ==== */
+window.addEventListener('resize', ()=>{
+  // re-align existing arrows horizontally to their corresponding sockets
+  arrows.forEach(a=>{
+    const idx = keys.indexOf(a.key);
+    if(idx >= 0){
+      const socketRect = sockets[idx].getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      a.el.style.left = (socketRect.left - stageRect.left) + 'px';
     }
   });
-}
-
-function updateComboDisplay(){
-  if(combo>=3){
-    comboDisplay.style.display="block";
-    comboDisplay.textContent = `COMBO x${combo}!`;
-    comboDisplay.style.opacity=1;
-    setTimeout(()=>comboDisplay.style.opacity=0,400);
-  }else{
-    comboDisplay.style.display="none";
-  }
-}
-
-document.addEventListener("keydown",(e)=>{
-  checkArrow(e.key);
 });
-
-const controlButtons = document.querySelectorAll("#controls button");
-controlButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    checkArrow(btn.dataset.key);
-  });
-});
-
-function updateScore(){
-  scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo} | Récord: ${record}`;
-}
-
-// Loop de movimiento
-setInterval(moveArrows,20);
-
-// Loop de creación sincronizada al BPM
-function arrowLoop(){
-  if(gameStarted){
-    createArrow();
-    setTimeout(arrowLoop, msPerBeat);
-  }
-}
 </script>
-
 </body>
 </html>
