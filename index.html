@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juego de Baile RSTV Socket</title>
+<title>RSTV Social Dance 4.0 Épico</title>
 <style>
 body {
   margin: 0;
@@ -55,7 +55,7 @@ h1 {
 }
 .socket.active {
   background: #ffd700;
-  box-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700;
+  box-shadow: 0 0 25px #ffd700, 0 0 50px #ffd700;
   color: #000;
   transform: scale(1.2);
 }
@@ -146,20 +146,20 @@ h1 {
 </head>
 <body>
 
-<h1>RSTV Social Dance Ultra Socket</h1>
+<h1>RSTV Social Dance 4.0 Épico</h1>
 
 <button id="startBtn">¡Comenzar Juego!</button>
 
 <div id="game">
   <div class="hit-zone">
-    <div class="socket">↑</div>
-    <div class="socket">↓</div>
-    <div class="socket">←</div>
-    <div class="socket">→</div>
+    <div class="socket" data-key="ArrowUp">↑</div>
+    <div class="socket" data-key="ArrowDown">↓</div>
+    <div class="socket" data-key="ArrowLeft">←</div>
+    <div class="socket" data-key="ArrowRight">→</div>
   </div>
   <div id="comboDisplay">COMBO!</div>
 </div>
-<div id="score">Puntaje: 0 | Combo: 0</div>
+<div id="score">Puntaje: 0 | Combo: 0 | Récord: 0</div>
 
 <div id="controls">
   <button data-key="ArrowUp">↑</button>
@@ -182,6 +182,7 @@ let score = 0;
 let combo = 0;
 let speed = 3;
 let intervalCreate = 1000;
+let record = localStorage.getItem("danceRecord") || 0;
 
 let gameStarted = false;
 const music = document.getElementById("music");
@@ -199,7 +200,6 @@ document.getElementById("startBtn").addEventListener("click", () => {
   }
 });
 
-// Crear flecha
 function createArrow(){
   const index = Math.floor(Math.random()*4);
   const key = keys[index];
@@ -208,13 +208,17 @@ function createArrow(){
   arrow.classList.add("arrow");
   arrow.textContent = symbol;
   arrow.dataset.key = key;
-  arrow.style.left = 22*index + "%";
+
+  // Posicionar sobre el socket exacto
+  const socketRect = sockets[index].getBoundingClientRect();
+  const gameRect = game.getBoundingClientRect();
+  arrow.style.left = socketRect.left - gameRect.left + "px";
+
   arrow.style.top = "-60px";
   game.appendChild(arrow);
   arrows.push(arrow);
 }
 
-// Mover flechas
 function moveArrows(){
   arrows.forEach((arrow,i)=>{
     let top = parseInt(arrow.style.top);
@@ -230,7 +234,6 @@ function moveArrows(){
   });
 }
 
-// Crear partículas doradas
 function createParticles(x, y){
   for(let i=0;i<8;i++){
     const p = document.createElement("div");
@@ -242,7 +245,6 @@ function createParticles(x, y){
   }
 }
 
-// Función de acierto
 function checkArrow(keyPressed){
   arrows.forEach((arrow,i)=>{
     let top = parseInt(arrow.style.top);
@@ -254,19 +256,23 @@ function checkArrow(keyPressed){
       combo +=1;
       updateScore();
       updateComboDisplay();
-      createParticles(parseInt(arrow.style.left), top);
+      const index = keys.indexOf(keyPressed);
+      const socket = sockets[index];
+      createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
 
-      // Brillo socket
-      sockets[keys.indexOf(keyPressed)].classList.add("active");
-      setTimeout(()=>sockets[keys.indexOf(keyPressed)].classList.remove("active"),200);
+      socket.classList.add("active");
+      setTimeout(()=>socket.classList.remove("active"),200);
 
       speed += 0.05;
       if(intervalCreate>400) intervalCreate -=5;
+      if(score>record){
+        record = score;
+        localStorage.setItem("danceRecord", record);
+      }
     }
   });
 }
 
-// Mostrar combo grande
 function updateComboDisplay(){
   if(combo>=3){
     comboDisplay.style.display="block";
@@ -278,12 +284,10 @@ function updateComboDisplay(){
   }
 }
 
-// Detectar teclado
 document.addEventListener("keydown",(e)=>{
   checkArrow(e.key);
 });
 
-// Detectar botones táctiles
 const controlButtons = document.querySelectorAll("#controls button");
 controlButtons.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -291,15 +295,12 @@ controlButtons.forEach(btn => {
   });
 });
 
-// Actualizar puntaje
 function updateScore(){
-  scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo}`;
+  scoreDisplay.textContent = `Puntaje: ${score} | Combo: ${combo} | Récord: ${record}`;
 }
 
-// Loop de movimiento
 setInterval(moveArrows,20);
 
-// Loop de creación de flechas
 function arrowLoop(){
   if(gameStarted){
     createArrow();
