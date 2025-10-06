@@ -1,109 +1,215 @@
-﻿<html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tetris RSTV</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg,#000,#111);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  h1 {
+    background: linear-gradient(90deg,#d4af37,#b8860b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  #tetris {
+    position: relative;
+    width: 200px;
+    height: 400px;
+    background: rgba(0,0,0,0.85);
+    border: 2px solid #d4af37;
+    margin-top: 20px;
+    display: grid;
+    grid-template-rows: repeat(20, 20px);
+    grid-template-columns: repeat(10, 20px);
+  }
+
+  .cell {
+    border: 1px solid #333;
+    box-sizing: border-box;
+  }
+
+  .filled {
+    background: linear-gradient(90deg,#d4af37,#b8860b);
+  }
+
+  #score {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #d4af37;
+  }
+</style>
+</head>
 <body>
-<link href="https://file.myfontastic.com/t5tNwfwUapz4yDzK3B6sfe/icons.css" rel="stylesheet">
-<link href="style.css" rel="stylesheet" type="text/css">
-    <header class="header">
-      <div class="contenedor">
-        <h1 class="logo">I.E. Nobel</h1>
-        <span class="icon-menu" id="btn-menu"></span>
-        <nav class="nav" id="nav">
-          <ul class="menu">
-            <li class="menu__item"><a href="#" class="menu__link " style="color:black">Inicio</a></li>
-       
-            <li class="menu__item"><a href="#" class="menu__link" style="color:black">Servicios</a></li>
-            <li class="menu__item"><a href="#" class="menu__link" style="color:black">Equipo</a></li>
-      
-            <li class="menu__item"><a href="#" class="menu__link" style="color:black">Contacto</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
-    <div class="banner">
-     <img src="sonrisa.jpg" alt="">
-      <div class="contenedor">
-        <p style="color:black;font-family:serif;font-size:20px;">Tel. - 6691 16 11 68</p>
-        <h2 class="banner__titulo">PLACAS DENTALES</h2>
-        <p class="banner__txt">La curva más linda de una mujer es su sonrisa</p>
-      </div>
-    </div>
-    <main class="main">
-      <div class="contenedor">
-        <section class="info">
-          <article class="info__columna">
-            <img src="uno.jpg" alt="" class="info__img" style="border-radius:5px;" >
-             <!--
-            <h2 class="info__titulo">Título 1</h2>
-            <p class="info__txt">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum aut, incidunt aperiam dicta totam cumque.</p>
-             -->
-          </article>
-          <article class="info__columna">
-            <img src="dos.jpg" alt="" class="info__img" style="border-radius:5px;">
-            <!--
-            <h2 class="info__titulo">Título 2</h2>
-            <p class="info__txt">Expedita totam, minima praesentium suscipit excepturi ducimus repellat harum ab, inventore neque cum! Nostrum, dicta!</p>
-             -->
-          </article>
-          <article class="info__columna">
-            <img src="tres.jpg" alt="" class="info__img" style="border-radius:5px;">
-	    <!--
-            <h2 class="info__titulo">Título 3</h2>
-            <p class="info__txt">Molestiae odit quas officia, dicta, nobis dolorem, quaerat eveniet accusantium excepturi est quidem, ducimus doloremque?</p>
-	    -->
-          </article>
-        </section>
-        <section class="cursos">
-          <h2 class="section__titulo">OFRECEMOS</h2>
-          <div class="cursos__columna">
-            <img src="consulta.jpg" alt="" class="cursos__img">
-            <div class="cursos__descripcion">
-              <h2 class="cursos__titulo">Consultas</h2>
-              <!--
-              <div class="cursos__txt">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, dignissimos.</div>
-              -->
-            </div>
-          </div>
-          <div class="cursos__columna">
-            <img src="aseso.jpg" alt="" class="cursos__img">
-            <div class="cursos__descripcion">
-              <h2 class="cursos__titulo">Asesoria</h2>
-              <!--
-              <div class="cursos__txt">Accusantium rem quia doloribus soluta ullam pariatur alias, quas dolorum.</div>
-              -->
-            </div>
-          </div>
-          <div class="cursos__columna">
-            <img src="placa.jpg" alt="" class="cursos__img">
-            <div class="cursos__descripcion">
-              <h2 class="cursos__titulo">Placas dentales</h2>
-              <!--
-              <div class="cursos__txt">Voluptates aspernatur magnam possimus natus, et nemo maxime sed vitae!</div>
-              -->
-            </div>
-          </div>
-          <div class="cursos__columna">
-            <img src="implan.jpg" alt="" class="cursos__img">
-            <div class="cursos__descripcion">
-              <h2 class="cursos__titulo">Implantes dentales</h2>
-              <!--
-              <div class="cursos__txt">Nulla, cumque sunt laudantium blanditiis deserunt, error dolores vero iure.</div>
-              -->
-            </div>
-          </div>
-        </section>
-        
-      </div>
-    </main>
-    <footer class="footer">
-      <div class="contenedor">
-        <div class="social">
-          <a href="#" class="icon-facebook"></a>
-          <a href="#" class="icon-twitter"></a>
-          <a href="#" class="icon-gplus"></a>
-          <a href="#" class="icon-vine"></a>
-        </div>
-        <p class="copy">Lic. Angelica Martinez Salinas&reg;</p>
-      </div>
-    </footer>
-    <script src="menu.js"></script>
-  </body>
+
+<h1>Tetris RSTV</h1>
+<div id="tetris"></div>
+<div id="score">Puntaje: 0</div>
+
+<script>
+const tetris = document.getElementById("tetris");
+const scoreDisplay = document.getElementById("score");
+const rows = 20;
+const cols = 10;
+let score = 0;
+
+// Crear grilla
+let grid = [];
+for(let r=0;r<rows;r++){
+  let row = [];
+  for(let c=0;c<cols;c++){
+    let cell = document.createElement("div");
+    cell.classList.add("cell");
+    tetris.appendChild(cell);
+    row.push(cell);
+  }
+  grid.push(row);
+}
+
+// Piezas Tetris
+const pieces = [
+  [[1,1,1,1]], // I
+  [[1,1],[1,1]], // O
+  [[0,1,0],[1,1,1]], // T
+  [[1,1,0],[0,1,1]], // S
+  [[0,1,1],[1,1,0]], // Z
+  [[1,0,0],[1,1,1]], // J
+  [[0,0,1],[1,1,1]]  // L
+];
+
+let currentPiece = {
+  shape: pieces[Math.floor(Math.random()*pieces.length)],
+  x: 3,
+  y: 0
+};
+
+// Dibujar pieza
+function draw(){
+  for(let r=0;r<currentPiece.shape.length;r++){
+    for(let c=0;c<currentPiece.shape[r].length;c++){
+      if(currentPiece.shape[r][c]){
+        let row = currentPiece.y + r;
+        let col = currentPiece.x + c;
+        if(row>=0 && row<rows && col>=0 && col<cols)
+          grid[row][col].classList.add("filled");
+      }
+    }
+  }
+}
+
+// Borrar pieza
+function undraw(){
+  for(let r=0;r<currentPiece.shape.length;r++){
+    for(let c=0;c<currentPiece.shape[r].length;c++){
+      if(currentPiece.shape[r][c]){
+        let row = currentPiece.y + r;
+        let col = currentPiece.x + c;
+        if(row>=0 && row<rows && col>=0 && col<cols)
+          grid[row][col].classList.remove("filled");
+      }
+    }
+  }
+}
+
+// Mover pieza
+function moveDown(){
+  undraw();
+  currentPiece.y++;
+  if(collide()){
+    currentPiece.y--;
+    lock();
+    currentPiece = {
+      shape: pieces[Math.floor(Math.random()*pieces.length)],
+      x: 3,
+      y:0
+    };
+  }
+  draw();
+}
+
+// Colisión
+function collide(){
+  for(let r=0;r<currentPiece.shape.length;r++){
+    for(let c=0;c<currentPiece.shape[r].length;c++){
+      if(currentPiece.shape[r][c]){
+        let row = currentPiece.y + r;
+        let col = currentPiece.x + c;
+        if(row>=rows || col<0 || col>=cols || grid[row][col].classList.contains("locked")){
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+// Bloquear pieza
+function lock(){
+  for(let r=0;r<currentPiece.shape.length;r++){
+    for(let c=0;c<currentPiece.shape[r].length;c++){
+      if(currentPiece.shape[r][c]){
+        let row = currentPiece.y + r;
+        let col = currentPiece.x + c;
+        grid[row][col].classList.add("locked");
+      }
+    }
+  }
+  clearLines();
+}
+
+// Limpiar líneas completas
+function clearLines(){
+  for(let r=rows-1;r>=0;r--){
+    let full = true;
+    for(let c=0;c<cols;c++){
+      if(!grid[r][c].classList.contains("locked")) full=false;
+    }
+    if(full){
+      for(let c=0;c<cols;c++){
+        grid[r][c].classList.remove("locked","filled");
+      }
+      // bajar líneas
+      for(let row=r-1; row>=0; row--){
+        for(let c=0;c<cols;c++){
+          if(grid[row][c].classList.contains("locked")){
+            grid[row][c].classList.remove("locked");
+            grid[row+1][c].classList.add("locked");
+          }
+        }
+      }
+      score += 10;
+      scoreDisplay.textContent = "Puntaje: "+score;
+      r++; // volver a chequear la misma línea
+    }
+  }
+}
+
+// Controles
+document.addEventListener("keydown",(e)=>{
+  undraw();
+  if(e.key==="ArrowLeft"){currentPiece.x--; if(collide()) currentPiece.x++}
+  if(e.key==="ArrowRight"){currentPiece.x++; if(collide()) currentPiece.x--}
+  if(e.key==="ArrowDown"){currentPiece.y++; if(collide()){currentPiece.y--; lock(); currentPiece = {shape: pieces[Math.floor(Math.random()*pieces.length)], x:3,y:0}}}
+  draw();
+});
+
+// Loop del juego
+draw();
+setInterval(moveDown,500);
+</script>
+</body>
 </html>
