@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSTV Social Dance - Pro</title>
+<title>RSTV Social Dance - Final Pro</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -26,7 +26,6 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 .video-card iframe{width:100%;height:350px;border:none;}
 #game-container{width:100%;max-width:360px;margin-top:20px;position:relative;}
 #game{position:relative;width:100%;height:500px;background:#111;overflow:hidden;border:2px solid #d4af37;}
-#backgroundCanvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;}
 .hit-zone{position:absolute;bottom:20px;width:100%;height:50px;display:flex;justify-content:space-around;z-index:2;}
 .socket{width:22%;max-width:60px;height:50px;border:2px dashed #d4af37;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#d4af37;font-size:1.5rem;transition: transform 0.2s, background 0.2s, box-shadow 0.2s;}
 .socket.active{background:#ffd700;box-shadow:0 0 30px #ffd700,0 0 60px #ffd700;color:#000;transform:scale(1.2);}
@@ -40,6 +39,14 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 #controls{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap;z-index:2;}
 #controls button{margin-top:10px;padding:10px 12px;font-size:1.3rem;border-radius:50%;border:2px solid #d4af37;background:#111;color:#fff;cursor:pointer;transition:0.3s;}
 #controls button:hover{box-shadow:0 0 10px #ffd700;transform:scale(1.1);}
+#flecha-styles{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap;}
+#flecha-styles button{border-radius:50%;border:2px solid #d4af37;background:#111;color:#fff;padding:10px;font-size:1.2rem;transition:0.3s;}
+#flecha-styles button:hover{box-shadow:0 0 10px #ffd700;transform:scale(1.1);}
+#nosotros .team{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:20px;}
+#nosotros .member{display:flex;flex-direction:column;align-items:center;gap:8px;}
+#nosotros .member img{width:120px;height:120px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;transition:0.3s;}
+#nosotros .member img:hover{transform:scale(1.05);box-shadow:0 0 15px #ffd700;}
+#nosotros .member p{max-width:150px;text-align:center;color:#fff;}
 @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.active{transform:translateX(0)}.menu-toggle{display:block;} main{margin-left:0;width:100%;}}
 </style>
 </head>
@@ -85,7 +92,13 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 <button id="startBtn"><i class="fa-solid fa-play"></i></button>
 <button id="pauseBtn"><i class="fa-solid fa-pause"></i></button>
 <button id="muteBtn"><i class="fa-solid fa-volume-xmark"></i></button>
-<button id="styleToggle"><i class="fa-solid fa-shapes"></i></button>
+<button id="restartBtn"><i class="fa-solid fa-rotate-right"></i></button>
+</div>
+<div id="flecha-styles">
+<button data-style="0"><i class="fa-solid fa-arrow-up"></i></button>
+<button data-style="1"><i class="fa-solid fa-arrow-down"></i></button>
+<button data-style="2"><i class="fa-solid fa-arrow-left"></i></button>
+<button data-style="3"><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div id="game">
 <div class="hit-zone">
@@ -103,14 +116,28 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 
 <section id="nosotros">
 <h1>Nosotros</h1>
-<p>Somos RSTV Social Dance: pasión, ritmo y comunidad en cada paso.</p>
+<div class="team">
+<div class="member"><img src="https://via.placeholder.com/120" alt=""><p>Frase 1</p></div>
+<div class="member"><img src="https://via.placeholder.com/120" alt=""><p>Frase 2</p></div>
+<div class="member"><img src="https://via.placeholder.com/120" alt=""><p>Frase 3</p></div>
+<div class="member"><img src="https://via.placeholder.com/120" alt=""><p>Frase 4</p></div>
+<div class="member"><img src="https://via.placeholder.com/120" alt=""><p>Frase 5</p></div>
+<div class="member"><img src="https://via.placeholder.com/120" alt=""><p>Frase 6</p></div>
+</div>
 </section>
-</main>
 
 <script>
 // Menu lateral
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault(); document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'}); if(window.innerWidth<=768) document.querySelector('.sidebar').classList.remove('active');});});
-document.querySelector('.menu-toggle').addEventListener('click',()=>{document.querySelector('.sidebar').classList.toggle('active');});
+document.querySelectorAll('.sidebar a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+    if(window.innerWidth<=768) document.querySelector('.sidebar').classList.remove('active');
+  });
+});
+document.querySelector('.menu-toggle').addEventListener('click',()=>{
+  document.querySelector('.sidebar').classList.toggle('active');
+});
 
 // Coreografías
 const selectorBaile=document.getElementById('selector-baile');
@@ -124,7 +151,8 @@ selectorBaile.addEventListener('change',()=>{
   contVideos.innerHTML='';
   if(videosPorBaile[val]){
     videosPorBaile[val].forEach(url=>{
-      const card=document.createElement('div'); card.className='video-card';
+      const card=document.createElement('div'); 
+      card.className='video-card';
       card.innerHTML=`<iframe src="${url}" allowfullscreen></iframe>`;
       contVideos.appendChild(card);
     });
@@ -132,38 +160,116 @@ selectorBaile.addEventListener('change',()=>{
 });
 
 // Juego de flechas
-const game=document.getElementById("game");
-const scoreDisplay=document.getElementById("score");
-const comboDisplay=document.getElementById("comboDisplay");
-const sockets=document.querySelectorAll(".socket");
-const keys=["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
-const symbols=["↑","↓","←","→"];
-let arrows=[], score=0, combo=0, speed=3, record=localStorage.getItem("danceRecord")||0, gameStarted=false, paused=false, styleAlternate=false;
-const music=document.getElementById("music");
-const hitStart=game.clientHeight-80;
-const hitEnd=game.clientHeight-30;
+const gameElem=document.getElementById("game");
+const scoreDisplayElem=document.getElementById("score");
+const comboDisplayElem=document.getElementById("comboDisplay");
+const socketsElem=document.querySelectorAll(".socket");
+const keysArr=["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
+const symbolsArr=["↑","↓","←","→"];
+let arrowsArr=[], scoreVal=0, comboVal=0, speedVal=3, recordVal=localStorage.getItem("danceRecord")||0;
+let gameStarted=false, paused=false, styleIndex=0;
+const musicElem=document.getElementById("music");
+const hitStartVal=gameElem.clientHeight-80;
+const hitEndVal=gameElem.clientHeight-30;
 const BPM=120; const msPerBeat=60000/BPM;
 
-document.getElementById("startBtn").addEventListener("click",()=>{ if(!gameStarted){ music.play(); gameStarted=true; arrowLoop(); }});
-document.getElementById("pauseBtn").addEventListener("click",()=>{ paused=!paused; paused?music.pause():music.play(); });
-document.getElementById("muteBtn").addEventListener("click",()=>{ music.muted=!music.muted; });
-document.getElementById("styleToggle").addEventListener("click",()=>{ styleAlternate=!styleAlternate; });
-
-function createArrow(){ if(paused) return;
-  const index=Math.floor(Math.random()*4); const key=keys[index]; const symbol=styleAlternate?["⬆️","⬇️","⬅️","➡️"][index]:symbols[index];
-  const arrow=document.createElement("div"); arrow.classList.add("arrow"); arrow.textContent=symbol; arrow.dataset.key=key;
-  const socketRect=sockets[index].getBoundingClientRect(); const gameRect=game.getBoundingClientRect();
-  arrow.style.left=socketRect.left-gameRect.left+"px"; arrow.style.top="-60px"; game.appendChild(arrow); arrows.push(arrow);
+// Funciones principales
+function createArrow(){
+  if(paused) return;
+  const index=Math.floor(Math.random()*4);
+  const key=keysArr[index];
+  let symbol=symbolsArr[index];
+  if(styleIndex==1) symbol=["⬆️","⬇️","⬅️","➡️"][index];
+  else if(styleIndex==2) symbol=["⇧","⇩","⇦","⇨"][index];
+  else if(styleIndex==3) symbol=["↑","↓","←","→"][index];
+  const arrow=document.createElement("div");
+  arrow.classList.add("arrow");
+  arrow.textContent=symbol;
+  arrow.dataset.key=key;
+  const socketRect=socketsElem[index].getBoundingClientRect();
+  const gameRect=gameElem.getBoundingClientRect();
+  arrow.style.left=socketRect.left-gameRect.left+"px";
+  arrow.style.top="-60px";
+  gameElem.appendChild(arrow);
+  arrowsArr.push(arrow);
 }
-function moveArrows(){ arrows.forEach((arrow,i)=>{ let top=parseInt(arrow.style.top); arrow.style.top=top+speed+"px"; if(top>game.clientHeight){ arrow.remove(); arrows.splice(i,1); combo=0; updateComboDisplay(); score-=5; updateScore(); } }); }
-function createParticles(x,y){ for(let i=0;i<12;i++){ const p=document.createElement("div"); p.classList.add("particles"); p.style.left=x+"px"; p.style.top=y+"px"; game.appendChild(p); setTimeout(()=>p.remove(),800);} }
-function checkArrow(keyPressed){ arrows.forEach((arrow,i)=>{ let top=parseInt(arrow.style.top); if(keyPressed===arrow.dataset.key && top>=hitStart && top<=hitEnd){ arrow.classList.add("hit"); setTimeout(()=>arrow.remove(),300); arrows.splice(i,1); score+=10+combo*2; combo+=1; updateScore(); updateComboDisplay(); const index=keys.indexOf(keyPressed); const socket=sockets[index]; createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25); socket.classList.add("active"); setTimeout(()=>socket.classList.remove("active"),200); speed+=0.05; if(score>record){ record=score; localStorage.setItem("danceRecord",record);} } }); }
-function updateComboDisplay(){ if(combo>=3){ comboDisplay.style.display="block"; comboDisplay.textContent=`COMBO x${combo}!`; comboDisplay.style.opacity=1; setTimeout(()=>comboDisplay.style.opacity=0,400);}else{comboDisplay.style.display="none";} }
-function updateScore(){ scoreDisplay.textContent=`Puntaje: ${score} | Combo: ${combo} | Récord: ${record}`; }
+function moveArrows(){
+  arrowsArr.forEach((arrow,i)=>{
+    let top=parseInt(arrow.style.top);
+    arrow.style.top=top+speedVal+"px";
+    if(top>gameElem.clientHeight){
+      arrow.remove();
+      arrowsArr.splice(i,1);
+      comboVal=0;
+      updateComboDisplay();
+      scoreVal-=5;
+      updateScore();
+    }
+  });
+}
+function createParticles(x,y){
+  for(let i=0;i<12;i++){
+    const p=document.createElement("div");
+    p.classList.add("particles");
+    p.style.left=x+"px";
+    p.style.top=y+"px";
+    gameElem.appendChild(p);
+    setTimeout(()=>p.remove(),800);
+  }
+}
+function checkArrow(keyPressed){
+  arrowsArr.forEach((arrow,i)=>{
+    let top=parseInt(arrow.style.top);
+    if(keyPressed===arrow.dataset.key && top>=hitStartVal && top<=hitEndVal){
+      arrow.classList.add("hit");
+      setTimeout(()=>arrow.remove(),300);
+      arrowsArr.splice(i,1);
+      scoreVal+=10+comboVal*2;
+      comboVal+=1;
+      updateScore();
+      updateComboDisplay();
+      const idx=keysArr.indexOf(keyPressed);
+      const socket=socketsElem[idx];
+      createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
+      socket.classList.add("active");
+      setTimeout(()=>socket.classList.remove("active"),200);
+      speedVal+=0.05;
+      if(scoreVal>recordVal){
+        recordVal=scoreVal;
+        localStorage.setItem("danceRecord",recordVal);
+      }
+    }
+  });
+}
+function updateComboDisplay(){ if(comboVal>=3){ comboDisplayElem.style.display="block"; comboDisplayElem.textContent=`COMBO x${comboVal}!`; comboDisplayElem.style.opacity=1; setTimeout(()=>comboDisplayElem.style.opacity=0,400);}else{comboDisplayElem.style.display="none";} }
+function updateScore(){ scoreDisplayElem.textContent=`Puntaje: ${scoreVal} | Combo: ${comboVal} | Récord: ${recordVal}`; }
+
+// Controles botones
+document.getElementById("startBtn").addEventListener("click",()=>{
+  if(!gameStarted){ musicElem.play(); gameStarted=true; arrowLoop(); }
+});
+document.getElementById("pauseBtn").addEventListener("click",()=>{ paused=!paused; if(!paused) arrowLoop(); paused?musicElem.pause():musicElem.play(); });
+document.getElementById("muteBtn").addEventListener("click",()=>{ musicElem.muted=!musicElem.muted; });
+document.getElementById("restartBtn").addEventListener("click",()=>{ arrowsArr.forEach(a=>a.remove()); arrowsArr=[]; scoreVal=0; comboVal=0; speedVal=3; updateScore(); updateComboDisplay(); });
+
+// Cambiar estilo flechas
+document.querySelectorAll("#flecha-styles button").forEach(btn=>{
+  btn.addEventListener("click",()=>{ styleIndex=parseInt(btn.dataset.style); });
+});
+
+// Detectar teclas
 document.addEventListener("keydown",(e)=>{ checkArrow(e.key); });
-document.querySelectorAll("#controls button").forEach(btn=>btn.addEventListener("click",()=>{ if(btn.id==="styleToggle") return; checkArrow(btn.dataset.key); }));
+
+// Loop de movimiento
 setInterval(()=>{ if(!paused) moveArrows(); },20);
-function arrowLoop(){ if(gameStarted && !paused){ createArrow(); setTimeout(arrowLoop, msPerBeat); } }
+
+// Loop de creación al BPM
+function arrowLoop(){
+  if(gameStarted && !paused){
+    createArrow();
+    setTimeout(arrowLoop, msPerBeat);
+  }
+}
 </script>
 
 </body>
