@@ -39,9 +39,9 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 #controls{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap;z-index:2;}
 #controls button{margin-top:10px;padding:10px 12px;font-size:1.3rem;border-radius:50%;border:2px solid #d4af37;background:#111;color:#fff;cursor:pointer;transition:0.3s;}
 #controls button:hover{box-shadow:0 0 10px #ffd700;transform:scale(1.1);}
-#flecha-styles{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap;}
-#flecha-styles button{border-radius:50%;border:2px solid #d4af37;background:#111;color:#fff;padding:10px;font-size:1.2rem;transition:0.3s;}
-#flecha-styles button:hover{box-shadow:0 0 10px #ffd700;transform:scale(1.1);}
+#chooseControls{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap;}
+#chooseControls button{border-radius:50%;border:2px solid #d4af37;background:#111;color:#fff;padding:10px;font-size:1.2rem;transition:0.3s;}
+#chooseControls button:hover{box-shadow:0 0 10px #ffd700;transform:scale(1.1);}
 #nosotros .team{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;margin-top:20px;}
 #nosotros .member{display:flex;flex-direction:column;align-items:center;gap:8px;}
 #nosotros .member img{width:120px;height:120px;border-radius:50%;border:3px solid #ffd700;object-fit:cover;transition:0.3s;}
@@ -86,19 +86,18 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 
 <section id="juego">
 <h1>Juego</h1>
-<p>Presiona las flechas al ritmo de la música 💥🎵</p>
+<p>Presiona la flecha correcta al llegar al socket 💥🎵</p>
 <div id="game-container">
 <div id="controls">
-<button id="startBtn"><i class="fa-solid fa-play"></i></button>
+<button id="startRestartBtn"><i class="fa-solid fa-play"></i></button>
 <button id="pauseBtn"><i class="fa-solid fa-pause"></i></button>
-<button id="muteBtn"><i class="fa-solid fa-volume-xmark"></i></button>
-<button id="restartBtn"><i class="fa-solid fa-rotate-right"></i></button>
+<button id="musicBtn"><i class="fa-solid fa-volume-high"></i></button>
 </div>
-<div id="flecha-styles">
-<button data-style="0"><i class="fa-solid fa-arrow-up"></i></button>
-<button data-style="1"><i class="fa-solid fa-arrow-down"></i></button>
-<button data-style="2"><i class="fa-solid fa-arrow-left"></i></button>
-<button data-style="3"><i class="fa-solid fa-arrow-right"></i></button>
+<div id="chooseControls">
+<button data-key="ArrowUp">↑</button>
+<button data-key="ArrowDown">↓</button>
+<button data-key="ArrowLeft">←</button>
+<button data-key="ArrowRight">→</button>
 </div>
 <div id="game">
 <div class="hit-zone">
@@ -127,7 +126,7 @@ p{max-width:650px;color:#ccc;line-height:1.7;font-size:1.1em;}
 </section>
 
 <script>
-// Menu lateral
+// Menú lateral
 document.querySelectorAll('.sidebar a[href^="#"]').forEach(a=>{
   a.addEventListener('click', e=>{
     e.preventDefault();
@@ -167,110 +166,43 @@ const socketsElem=document.querySelectorAll(".socket");
 const keysArr=["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];
 const symbolsArr=["↑","↓","←","→"];
 let arrowsArr=[], scoreVal=0, comboVal=0, speedVal=3, recordVal=localStorage.getItem("danceRecord")||0;
-let gameStarted=false, paused=false, styleIndex=0;
+let gameStarted=false, paused=false;
 const musicElem=document.getElementById("music");
 const hitStartVal=gameElem.clientHeight-80;
 const hitEndVal=gameElem.clientHeight-30;
 const BPM=120; const msPerBeat=60000/BPM;
 
-// Funciones principales
-function createArrow(){
-  if(paused) return;
-  const index=Math.floor(Math.random()*4);
-  const key=keysArr[index];
-  let symbol=symbolsArr[index];
-  if(styleIndex==1) symbol=["⬆️","⬇️","⬅️","➡️"][index];
-  else if(styleIndex==2) symbol=["⇧","⇩","⇦","⇨"][index];
-  else if(styleIndex==3) symbol=["↑","↓","←","→"][index];
-  const arrow=document.createElement("div");
-  arrow.classList.add("arrow");
-  arrow.textContent=symbol;
-  arrow.dataset.key=key;
-  const socketRect=socketsElem[index].getBoundingClientRect();
-  const gameRect=gameElem.getBoundingClientRect();
-  arrow.style.left=socketRect.left-gameRect.left+"px";
-  arrow.style.top="-60px";
-  gameElem.appendChild(arrow);
-  arrowsArr.push(arrow);
-}
-function moveArrows(){
-  arrowsArr.forEach((arrow,i)=>{
-    let top=parseInt(arrow.style.top);
-    arrow.style.top=top+speedVal+"px";
-    if(top>gameElem.clientHeight){
-      arrow.remove();
-      arrowsArr.splice(i,1);
-      comboVal=0;
-      updateComboDisplay();
-      scoreVal-=5;
-      updateScore();
-    }
-  });
-}
-function createParticles(x,y){
-  for(let i=0;i<12;i++){
-    const p=document.createElement("div");
-    p.classList.add("particles");
-    p.style.left=x+"px";
-    p.style.top=y+"px";
-    gameElem.appendChild(p);
-    setTimeout(()=>p.remove(),800);
-  }
-}
-function checkArrow(keyPressed){
-  arrowsArr.forEach((arrow,i)=>{
-    let top=parseInt(arrow.style.top);
-    if(keyPressed===arrow.dataset.key && top>=hitStartVal && top<=hitEndVal){
-      arrow.classList.add("hit");
-      setTimeout(()=>arrow.remove(),300);
-      arrowsArr.splice(i,1);
-      scoreVal+=10+comboVal*2;
-      comboVal+=1;
-      updateScore();
-      updateComboDisplay();
-      const idx=keysArr.indexOf(keyPressed);
-      const socket=socketsElem[idx];
-      createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);
-      socket.classList.add("active");
-      setTimeout(()=>socket.classList.remove("active"),200);
-      speedVal+=0.05;
-      if(scoreVal>recordVal){
-        recordVal=scoreVal;
-        localStorage.setItem("danceRecord",recordVal);
-      }
-    }
-  });
-}
-function updateComboDisplay(){ if(comboVal>=3){ comboDisplayElem.style.display="block"; comboDisplayElem.textContent=`COMBO x${comboVal}!`; comboDisplayElem.style.opacity=1; setTimeout(()=>comboDisplayElem.style.opacity=0,400);}else{comboDisplayElem.style.display="none";} }
-function updateScore(){ scoreDisplayElem.textContent=`Puntaje: ${scoreVal} | Combo: ${comboVal} | Récord: ${recordVal}`; }
+// Botones
+const startRestartBtn=document.getElementById("startRestartBtn");
+const pauseBtn=document.getElementById("pauseBtn");
+const musicBtn=document.getElementById("musicBtn");
+const chooseButtons=document.querySelectorAll("#chooseControls button");
 
-// Controles botones
-document.getElementById("startBtn").addEventListener("click",()=>{
-  if(!gameStarted){ musicElem.play(); gameStarted=true; arrowLoop(); }
-});
-document.getElementById("pauseBtn").addEventListener("click",()=>{ paused=!paused; if(!paused) arrowLoop(); paused?musicElem.pause():musicElem.play(); });
-document.getElementById("muteBtn").addEventListener("click",()=>{ musicElem.muted=!musicElem.muted; });
-document.getElementById("restartBtn").addEventListener("click",()=>{ arrowsArr.forEach(a=>a.remove()); arrowsArr=[]; scoreVal=0; comboVal=0; speedVal=3; updateScore(); updateComboDisplay(); });
-
-// Cambiar estilo flechas
-document.querySelectorAll("#flecha-styles button").forEach(btn=>{
-  btn.addEventListener("click",()=>{ styleIndex=parseInt(btn.dataset.style); });
+startRestartBtn.addEventListener("click",()=>{
+  arrowsArr.forEach(a=>a.remove());
+  arrowsArr=[];
+  scoreVal=0; comboVal=0; speedVal=3;
+  updateScore(); updateComboDisplay();
+  if(!gameStarted){ musicElem.play(); gameStarted=true; startRestartBtn.innerHTML='<i class="fa-solid fa-rotate-right"></i>'; arrowLoop();}
 });
 
-// Detectar teclas
+pauseBtn.addEventListener("click",()=>{ paused=!paused; paused?musicElem.pause():musicElem.play(); });
+
+musicBtn.addEventListener("click",()=>{ musicElem.muted=!musicElem.muted; musicBtn.innerHTML = musicElem.muted ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>'; });
+
+// Funciones
+function createArrow(){ if(paused) return; const index=Math.floor(Math.random()*4); const key=keysArr[index]; const symbol=symbolsArr[index]; const arrow=document.createElement("div"); arrow.classList.add("arrow"); arrow.textContent=symbol; arrow.dataset.key=key; const socketRect=socketsElem[index].getBoundingClientRect(); const gameRect=gameElem.getBoundingClientRect(); arrow.style.left=socketRect.left-gameRect.left+"px"; arrow.style.top="-60px"; gameElem.appendChild(arrow); arrowsArr.push(arrow);}
+function moveArrows(){ arrowsArr.forEach((arrow,i)=>{let top=parseInt(arrow.style.top); arrow.style.top=top+speedVal+"px"; if(top>gameElem.clientHeight){arrow.remove();arrowsArr.splice(i,1);comboVal=0;updateComboDisplay();scoreVal-=5;updateScore();}});}
+function createParticles(x,y){for(let i=0;i<12;i++){const p=document.createElement("div");p.classList.add("particles");p.style.left=x+"px";p.style.top=y+"px";gameElem.appendChild(p);setTimeout(()=>p.remove(),800);}}
+function checkArrow(keyPressed){arrowsArr.forEach((arrow,i)=>{let top=parseInt(arrow.style.top);if(keyPressed===arrow.dataset.key && top>=hitStartVal && top<=hitEndVal){arrow.classList.add("hit");setTimeout(()=>arrow.remove(),300);arrowsArr.splice(i,1);scoreVal+=10+comboVal*2;comboVal+=1;updateScore();updateComboDisplay();const idx=keysArr.indexOf(keyPressed);const socket=socketsElem[idx];createParticles(parseInt(socket.offsetLeft)+socket.offsetWidth/2, top+25);socket.classList.add("active");setTimeout(()=>socket.classList.remove("active"),200);speedVal+=0.05;if(scoreVal>recordVal){recordVal=scoreVal;localStorage.setItem("danceRecord",recordVal);}}});}
+function updateComboDisplay(){ if(comboVal>=3){ comboDisplayElem.style.display="block"; comboDisplayElem.textContent=`COMBO x${comboVal}!`; comboDisplayElem.style.opacity=1; setTimeout(()=>comboDisplayElem.style.opacity=0,400);}else comboDisplayElem.style.display="none";}
+function updateScore(){ scoreDisplayElem.textContent=`Puntaje: ${scoreVal} | Combo: ${comboVal} | Récord: ${recordVal}`;}
+chooseButtons.forEach(btn=>{ btn.addEventListener("click",()=>{ checkArrow(btn.dataset.key); }); });
 document.addEventListener("keydown",(e)=>{ checkArrow(e.key); });
-
-// Loop de movimiento
 setInterval(()=>{ if(!paused) moveArrows(); },20);
-
-// Loop de creación al BPM
-function arrowLoop(){
-  if(gameStarted && !paused){
-    createArrow();
-    setTimeout(arrowLoop, msPerBeat);
-  }
-}
+function arrowLoop(){if(gameStarted && !paused){createArrow(); setTimeout(arrowLoop, msPerBeat);}}
 </script>
 
+</main>
 </body>
 </html>
